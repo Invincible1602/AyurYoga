@@ -1,0 +1,66 @@
+Index,Asana Name,Type,Disease 1,Disease 2,Disease 3,Disease 4,Disease 5,Should Not Perform Reason 1,Should Not Perform Reason 2,Should Not Perform 3,Should Not Perform 4,Should Not Perform 5
+0,Virabhadrasana I,Asana,Anxiety,Depression,Sciatica,Stress,null,Knee Injury,Pregnancy,null,null,null
+1,Virabhadrasana II,Asana,Digestive Issues,Anxiety,Fatigue,Stress,null,Neck Injury,null,null,null,null
+2,Virabhadrasana III,Asana,Poor Posture,Anxiety,Stress,Fatigue,null,Ankle Injury,null,null,null,null
+3,Trikonasana,Asana,Digestive Issues,Urinary Issues,Sciatica,Endocrine Problems (Diabetes/Infertility/Thyroid),Neck Injury,Urinary Tract Infection,Excessive Growth of Thyroid Gland,null,null
+4,Ardha Chandrasana,Asana,Insomnia,Anxiety,Stress,Fatigue,null,Low Blood Pressure,null,null,null,null
+5,Ustrasana,Asana,Asthma,Digestive Issues,Urinary Issues,Depression,High Blood Pressure,Hernia,null,null,null,null
+6,Matsyasana,Asana,Fatigue,Anxiety,Insomnia,Stress,null,Neck Injury,Back Pain,null,null,null
+7,Marjariasana,Asana,Digestive Issues,Anxiety,Stress,Fatigue,null,Wrist Injury,null,null,null,null
+8,Bitilasana,Asana,Back Pain,Digestive Issues,Anxiety,Stress,null,Shoulder Injury,null,null,null,null
+9,Garudasana,Asana,Sciatica,Anxiety,Stress,Fatigue,null,Knee or Ankle Injury,null,null,null,null
+10,Anjaneyasana,Asana,Anxiety,Sciatica,Depression,Stress,null,Hip Injury,null,null,null,null
+11,Vrikshasana,Asana,Poor Posture,Anxiety,Stress,Fatigue,null,Foot or Ankle Injury,null,null,null,null
+12,Padangusthasana,Asana,Anxiety,Digestive Issues,Sciatica,Stress,null,Hamstring Injury,null,null,null,null
+13,Bakasana,Asana,Digestive Issues,Anxiety,Stress,Depression,null,Wrist Injury,Pregnancy,null,null,null
+14,Mayurasana,Asana,Digestive Issues,Urinary Issues,Depression,Endocrine Problems (Diabetes/Infertility/Thyroid),Elbow or Shoulder Injury,Urinary Tract Infection,Excessive Growth of Thyroid Gland,null,null
+15,Navasana,Asana,Digestive Issues,Anxiety,Stress,Fatigue,null,Abdominal Surgery,null,null,null,null
+16,Salabhasana,Asana,Sciatica,Anxiety,Digestive Issues,Stress,null,Lower Back Injury,null,null,null,null
+17,Supta Virasana,Asana,Anxiety,Digestive Issues,Stress,Fatigue,null,Knee Injury,Pregnancy,null,null,null
+18,Matsyendrasana,Asana,Urinary Issues,Digestive Issues,Sciatica,Endocrine Problems (Diabetes/Infertility/Thyroid),Spinal Injury,Urinary Tract Infection,Excessive Growth of Thyroid Gland,null,null
+19,Shavasana,Asana,Respiratory Diseases,NervousSystem(BrainFever/MentalDisease),Stress,Insomnia,Heart Problems,Later Stage (tuberculosis),TumorsofBrain(NervousSystem),Meningitis,null
+20,Ardha Matsyendrasana,Asana,Digestive Issues,Urinary Issues,Sciatica,Stress,null,Hip or Knee Injury,Urinary Tract Infection,null,null,null
+21,Kurmasana,Asana,Anxiety,Digestive Issues,Stress,Fatigue,null,Shoulder Injury,null,null,null,null
+22,Garbhasana,Asana,Anxiety,Digestive Issues,Stress,null,null,Depression,Pregnancy,null,null,null
+23,Gomukhasana,Asana,Anxiety,Stress,Sciatica,Digestive Issues,null,Shoulder or Hip Injury,null,null,null,null
+24,Pasasana,Asana,Digestive Issues,Anxiety,Stress,Fatigue,null,Knee Injury,Pregnancy,null,null,null
+25,Supta Baddha Konasana,Asana,Anxiety,Insomnia,Stress,Fatigue,null,Groin Injury,null,null,null,null
+26,Upavistha Konasana,Asana,Anxiety,Digestive Issues,Sciatica,null,null,Stress,Hip or Hamstring Injury,null,null,null
+27,Sirsasana,Asana,Depression,Stress,Insomnia,null,null,High Blood Pressure,Neck Injury,null,null,null
+28,Bhramari Pranayama,Pranayama,Muscular/SkeletalProblems,Insomnia,Endocrine Problems (Diabetes/Infertility/Thyroid),Depression,null,NervousSystem(BrainFever/MentalDisease),null,Meningitis,TumorsofBrain(NervousSystem)
+29,Anulom Vilom Pranayama,Pranayama,Anxiety,Digestive Issues,Stress,Fatigue,null,null,null,null,null,null
+30,Utkatasana,Asana,Poor Posture,Anxiety,Sciatica,Stress,null,Knee Injury,Pregnancy,null,null,null
+31,Adho Mukha Vrksasana,Asana,Anxiety,Depression,Stress,Fatigue,null,Shoulder or Wrist Injury,null,null,null,null
+32,Dandasana,Asana,Poor Posture,Anxiety,Sciatica,null,null,Stress,Back Injury,null,null,null
+33,Supta Padangusthasana,Asana,Anxiety,Insomnia,Stress,Fatigue,null,Hamstring Injury,null,null,null,null
+34,Halasana,Asana,Heart Problems,Digestive Issues,Urinary Issues,Respiratory Diseases,null,Neck Injury,Pregnancy,Urinary Tract Infection,null,null
+35,Paripurna Navasana,Asana,Digestive Issues,Anxiety,Stress,Fatigue,null,Abdominal Surgery,null,null,null,null
+36,Kapotasana,Asana,Digestive Issues,Sciatica,Stress,null,null,Back Injury,Pregnancy,null,null,null
+37,Surya Namaskar,Asana,Urinary Issues,Depression,Stress,Fatigue,Muscular/SkeletalProblems,Urinary Tract Infection,CongenitalMusculardisorders,Meningitis,null,null
+38,Vajrasana,Asana,Digestive Issues,NervousSystem(BrainFever/MentalDisease),null,null,null,TumorsofBrain(NervousSystem),Meningitis,Stomach Ulcer,null,null
+39,Suptavajrasana,Asana,Digestive Issues,null,null,null,null,Enteritis,Stomach Ulcer,null,null,null
+40,Paschimottanasana,Asana,Digestive Issues,Respiratory Diseases,Urinary Issues,Endocrine Problems (Diabetes/Infertility/Thyroid),Later Stage (tuberculosis),Stomach Ulcer,Urinary Tract Infection,Excessive Growth of Thyroid Gland,null
+41,Pavanmuktasana,Asana,Digestive Issues,Respiratory Diseases,Urinary Issues,Endocrine Problems (Diabetes/Infertility/Thyroid),Later Stage (tuberculosis),Stomach Ulcer,Urinary Tract Infection,Excessive Growth of Thyroid Gland,null
+42,Katichakrasana,Asana,Digestive Issues,Urinary Issues,null,null,null,Urinary Tract Infection,Stomach Ulcer,null,null,null
+43,Sarpasana,Asana,Digestive Issues,null,null,null,null,Enteritis,Stomach Ulcer,null,null,null
+44,Dhanurasana,Asana,Digestive Issues,Urinary Issues,null,null,null,Urinary Tract Infection,Stomach Ulcer,null,null,null
+45,Sarvangasana,Asana,Digestive Issues,Heart Problems,Respiratory Diseases,Endocrine Problems (Diabetes/Infertility/Thyroid),Muscular/SkeletalProblems,Later Stage (tuberculosis),Stomach Ulcer,Excessive Growth of Thyroid Gland,CongenitalMusculardisorders,null
+46,Akarnadhanurasna,Asana,Digestive Issues,Respiratory Diseases,null,null,null,Later Stage (tuberculosis),Stomach Ulcer,null,null,null
+47,Nadi Shodan Pranayama,Pranayama,Digestive Issues,Heart Problems,Urinary Issues,Endocrine Problems (Diabetes/Infertility/Thyroid),NervousSystem(BrainFever/MentalDisease),Severe Heart Disease,Stomach Ulcer,Urinary Tract Infection,TumorsofBrain(NervousSystem),null
+48,Bhasrika Pranayama,Pranayama,Digestive Issues,Heart Problems,Respiratory Diseases,Urinary Issues,Endocrine Problems (Diabetes/Infertility/Thyroid),Severe Heart Disease,Stomach Ulcer,Urinary Tract Infection,Excessive Growth of Thyroid Gland,TumorsofBrain(NervousSystem)
+49,Shirshasana,Asana,Heart Problems,Endocrine Problems (Diabetes/Infertility/Thyroid),Muscular/SkeletalProblems,null,null,Severe Heart Disease,Excessive Growth of Thyroid Gland,CongenitalMusculardisorders,null,null
+50,Naukasana,Asana,Heart Problems,Respiratory Diseases,Urinary Issues,null,null,Severe Heart Disease,Later Stage (tuberculosis),Urinary Tract Infection,null,null
+51,Karnapidasana,Asana,Heart Problems,Respiratory Diseases,null,null,null,Severe Heart Disease,Later Stage (tuberculosis),null,null,null
+52,Suryabhedan Pranayama,Pranayama,Respiratory Diseases,null,null,null,null,Bleeding with Cough,Later Stage (tuberculosis),null,null,null
+53,Simhasana,Asana,Respiratory Diseases,null,null,null,null,Bleeding with Cough,Later Stage (tuberculosis),null,null,null
+54,Supta-Katichakrasana,Asana,Urinary Issues,Endocrine Problems (Diabetes/Infertility/Thyroid),null,null,null,Urinary Tract Infection,Excessive Growth of Thyroid Gland,null,null,null
+55,Bhujangasana,Asana,Urinary Issues,null,null,null,null,Urinary Tract Infection,Hematuria,null,null,null
+56,Bhunamanasana,Asana,Urinary Issues,null,null,null,null,Urinary Tract Infection,Hematuria,null,null,null
+57,Hastapadangushtasana,Asana,Urinary Issues,null,null,null,null,Urinary Tract Infection,Hematuria,null,null,null
+58,Suryabhedi,Pranayama,Endocrine Problems (Diabetes/Infertility/Thyroid),NervousSystem(BrainFever/MentalDisease),Muscular/SkeletalProblems,null,null,Excessive Growth of Thyroid Gland,Acute Stage of Diabetes,TumorsofBrain(NervousSystem),null,null
+59,Pranava (Om) Pronunciation,Pranayama,Endocrine Problems (Diabetes/Infertility/Thyroid),null,null,null,null,Excessive Growth of Thyroid Gland,Acute Stage of Diabetes,null,null,null
+60,Padmasana,Asana,NervousSystem(BrainFever/MentalDisease),null,null,null,null,TumorsofBrain(NervousSystem),Meningitis,null,null,null
+61,Sukhasana,Asana,NervousSystem(BrainFever/MentalDisease),null,null,null,null,TumorsofBrain(NervousSystem),Meningitis,null,null,null
+62,Chandrabedi,Pranayama,NervousSystem(BrainFever/MentalDisease),Muscular/SkeletalProblems,null,null,null,TumorsofBrain(NervousSystem),Meningitis,null,null,null
+63,Tadasana,Asana,Muscular/SkeletalProblems,null,null,null,null,TumorofMusculoSkeltalSystem,CongenitalMusculardisorders,null,null,null
+64,Shalbhasana,Asana,Muscular/SkeletalProblems,null,null,null,null,TumorofMusculoSkeltalSystem,CongenitalMusculardisorders,null,null,null
