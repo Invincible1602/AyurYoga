@@ -1,0 +1,12 @@
+Flask
+flask-cors
+requests
+faiss-cpu
+sentence-transformers
+python-dotenv
+PyMuPDF
+streamlit
+pandas
+scikit-learn
+joblib
+difflib
