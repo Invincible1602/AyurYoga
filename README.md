@@ -15,8 +15,8 @@ AyurYoga is a web application designed to offer personalized yoga recommendation
 
 ## Tech Stack  
 - **Frontend**: React  
-- **Backend**: Django, Python  
-- **Natural Language Processing**: Dialogflow  
+- **Backend**: FastApi, Python  
+
 
 ---
 
@@ -24,8 +24,7 @@ AyurYoga is a web application designed to offer personalized yoga recommendation
 
 ### Prerequisites  
 - Python 3.8 or higher  
-- Django  
-- Dialogflow  
+- FastApi
 
 ### Installation  
 
