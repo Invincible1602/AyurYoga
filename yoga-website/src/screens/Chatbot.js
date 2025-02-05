@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Chatbot = () => {
   const [userInput, setUserInput] = useState("");
   const [botResponse, setBotResponse] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     setUserInput(e.target.value);
@@ -13,11 +13,6 @@ const Chatbot = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!userInput.trim()) {
-      setError("Please enter a valid question.");
-      return;
-    }
-    setError("");
     setLoading(true);
     setBotResponse("");
 
@@ -25,67 +20,107 @@ const Chatbot = () => {
       const response = await axios.post("http://127.0.0.1:5000/get_response", {
         message: userInput,
       });
-
-      if (response.data && response.data.response) {
-        setBotResponse(response.data.response);
-      } else {
-        setError("Unexpected response from the server.");
-      }
+      setBotResponse(response.data.response);
     } catch (err) {
-      if (err.response) {
-        setError(`Server error: ${err.response.statusText}`);
-      } else if (err.request) {
-        setError("Network error: Could not reach the server.");
-      } else {
-        setError("Error communicating with the server. Please try again.");
-      }
+      setBotResponse("Error communicating with the server. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Yoga Chatbot</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          placeholder="Ask a question about yoga or medical knowledge"
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? "Loading..." : "Ask"}
-        </button>
-      </form>
-      {error && <p style={styles.error}>{error}</p>}
-      {botResponse && (
-        <div style={styles.responseCard}>
-          <h2 style={styles.responseHeader}>Bot Response</h2>
-          <p style={styles.responseText}>{botResponse}</p>
+    <>
+      <nav style={styles.navbar}>
+        <div style={styles.navbarContent}>
+          <Link to="/" style={styles.navbarBrand}>Yoga Bliss</Link>
+          <ul style={styles.navLinks}>
+            <li><Link to="/" style={styles.navLink}>Home</Link></li>
+            <li><Link to="/recommender" style={styles.navLink}>Recommendations</Link></li>
+            <li><Link to="/about" style={styles.navLink}>About</Link></li>
+            
+          </ul>
         </div>
-      )}
-    </div>
+      </nav>
+      
+      <div style={styles.container}>
+        <h1 style={styles.header}>🧘 Yoga Chatbot</h1>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <input
+            type="text"
+            value={userInput}
+            onChange={handleInputChange}
+            placeholder="Ask about yoga or medical knowledge..."
+            style={styles.input}
+          />
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? <div style={styles.spinner}></div> : "Ask"}
+          </button>
+        </form>
+
+        {botResponse && (
+          <div style={styles.responseCard}>
+            <h2 style={styles.responseHeader}>🤖 Bot Response:</h2>
+            <p style={styles.responseText}>{botResponse}</p>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
+// Styles Object
 const styles = {
+  navbar: {
+    backgroundColor: '#2c3e50',
+    padding: '15px 30px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+  },
+  navbarContent: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  navbarBrand: {
+    fontSize: '2rem',
+    color: '#fff',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+  },
+  navLinks: {
+    listStyle: 'none',
+    display: 'flex',
+    padding: 0,
+    margin: 0,
+  },
+  navLink: {
+    color: '#fff',
+    fontSize: '1.1rem',
+    textDecoration: 'none',
+    marginLeft: '25px',
+    transition: 'color 0.3s ease',
+  },
   container: {
-    fontFamily: "Arial, sans-serif",
-    padding: "20px",
     maxWidth: "600px",
-    margin: "0 auto",
+    margin: "100px auto",
+    padding: "20px",
+    backgroundColor: "#ffffff",
+    borderRadius: "12px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     textAlign: "center",
-    backgroundColor: "#f9f9f9",
-    borderRadius: "10px",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    fontFamily: "Arial, sans-serif",
   },
   header: {
-    color: "#333",
-    marginBottom: "20px",
     fontSize: "24px",
     fontWeight: "bold",
+    color: "#333",
+    marginBottom: "20px",
   },
   form: {
     display: "flex",
@@ -97,41 +132,37 @@ const styles = {
     width: "100%",
     padding: "12px",
     fontSize: "16px",
+    border: "2px solid #ccc",
     borderRadius: "8px",
-    border: "1px solid #ccc",
     outline: "none",
-    boxShadow: "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
+    transition: "border-color 0.3s ease-in-out",
   },
   button: {
-    padding: "12px 25px",
+    width: "100%",
+    padding: "12px",
     fontSize: "16px",
-    backgroundColor: "#007BFF",
+    fontWeight: "bold",
     color: "#fff",
+    backgroundColor: "#007bff",
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
-  },
-  buttonHover: {
-    backgroundColor: "#0056b3",
-  },
-  error: {
-    color: "red",
-    marginTop: "10px",
-    fontWeight: "bold",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   responseCard: {
     marginTop: "20px",
-    padding: "20px",
-    backgroundColor: "#fff",
+    padding: "15px",
+    backgroundColor: "#f1f1f1",
     borderRadius: "10px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
     textAlign: "left",
   },
   responseHeader: {
-    margin: "0 0 10px 0",
     fontSize: "18px",
-    color: "#007BFF",
+    color: "#007bff",
+    marginBottom: "8px",
   },
   responseText: {
     fontSize: "16px",
