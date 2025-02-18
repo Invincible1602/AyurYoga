@@ -8,22 +8,25 @@ from sentence_transformers import SentenceTransformer
 import os
 from dotenv import load_dotenv  
 
-# Load environment variables from .env file
+
 load_dotenv()
 HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
-# Hugging Face API URL
+
 HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 
-# Load FAISS Index & Text Data
+
 INDEX_PATH = "faiss_index.pkl"
 DATA_PATH = "text_data.pkl"
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-# Load sentence-transformers model
+
+RELEVANCE_THRESHOLD = 1.0
+
+
 model = SentenceTransformer(EMBEDDING_MODEL)
 
-# Load index & data
+
 with open(INDEX_PATH, "rb") as f:
     index = pickle.load(f)
 with open(DATA_PATH, "rb") as f:
@@ -36,6 +39,11 @@ def search_similar_text(query, top_k=3):
     """Searches for similar text in FAISS index."""
     query_embedding = model.encode([query], convert_to_numpy=True)
     distances, indices = index.search(query_embedding, top_k)
+    
+    
+    if distances[0][0] > RELEVANCE_THRESHOLD:
+        return []
+    
     retrieved_text = [text_data[i] for i in indices[0]]
     return retrieved_text
 
@@ -45,13 +53,14 @@ def query_huggingface(prompt):
     
     retrieved_text = search_similar_text(prompt)
     
+   
     if not retrieved_text or all(len(text.strip()) == 0 for text in retrieved_text):
-        return "Oops, I couldn't find relevant information in my knowledge base. Could you please rephrase your question or ask about something else? I'm here to help!"
+        return "Sorry No response"
 
-    # Format retrieved context in a structured way
+   
     formatted_context = "\n".join([f"{i+1}. {text}" for i, text in enumerate(retrieved_text)])
     
-    # Construct a more refined prompt
+   
     full_prompt = (
         "You are an expert in yoga, health, and wellness. "
         "Use the provided context to answer the user's question clearly and concisely.\n\n"
@@ -65,15 +74,21 @@ def query_huggingface(prompt):
     response = requests.post(HF_API_URL, headers=headers, json=payload)
     
     if response.status_code == 200:
-        generated_text = response.json()[0].get("generated_text", "").strip()
-        
-        if not generated_text:
-            return "Hmm, I couldn't find a precise answer. Could you try rephrasing your question or asking about something else? I'll do my best to assist!"
-
-        return f"Here's what I found: {generated_text} Let me know if you'd like more details or have any follow-up questions!"
-
+        result = response.json()
+        if isinstance(result, list) and result and "generated_text" in result[0]:
+            generated_text = result[0]["generated_text"].strip()
+            if generated_text:
+                return (
+                    "Thank you for your question. Based on the context provided, here's a detailed response:\n\n"
+                    f"{generated_text}\n\n"
+                    "I hope this answers your query. Please let me know if you have any follow-up questions or need further clarification."
+                )
+        return "I'm sorry, I couldn't generate a detailed response. Could you please rephrase your question or provide more details?"
     else:
-        return f"I'm having a little trouble connecting to my knowledge base right now (Error {response.status_code}). Can you please try again later? Thanks for your patience!"
+        return (
+            f"I'm experiencing some technical difficulties connecting to my knowledge base (Error {response.status_code}). "
+            "Could you please try again later? Thanks for your patience!"
+        )
 
 @app.route("/")
 def home():
