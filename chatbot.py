@@ -30,10 +30,17 @@ model = SentenceTransformer(EMBEDDING_MODEL)
 
 # Load FAISS index & text data with error handling
 try:
-    with open(INDEX_PATH, "rb") as f:
-        index = pickle.load(f)
-    with open(DATA_PATH, "rb") as f:
-        text_data = pickle.load(f)
+    if os.path.exists(INDEX_PATH) and os.path.exists(DATA_PATH):
+        with open(INDEX_PATH, "rb") as f:
+            index = pickle.load(f)
+        with open(DATA_PATH, "rb") as f:
+            text_data = pickle.load(f)
+
+        if not isinstance(index, faiss.IndexFlatL2):
+            raise ValueError("Loaded FAISS index is not a valid IndexFlatL2 object")
+        logging.info("FAISS index and text data loaded successfully!")
+    else:
+        raise FileNotFoundError("FAISS index or text data file is missing.")
 except Exception as e:
     logging.error(f"Error loading FAISS index or text data: {e}")
     index, text_data = None, []
@@ -49,17 +56,18 @@ def search_similar_text(query):
         return []
 
     query_embedding = model.encode([query], convert_to_numpy=True)
-    
+
     # Ensure query_embedding has correct shape (1, d)
     query_embedding = np.array(query_embedding).reshape(1, -1)
 
-    distances, indices = index.search(query_embedding, TOP_K)
-
-    # Filter based on relevance threshold
-    relevant_texts = [text_data[i] for i, d in zip(indices[0], distances[0]) if d <= RELEVANCE_THRESHOLD]
-
-    logging.info(f"Retrieved {len(relevant_texts)} relevant texts for query: {query}")
-    return relevant_texts
+    try:
+        distances, indices = index.search(query_embedding, TOP_K)
+        relevant_texts = [text_data[i] for i, d in zip(indices[0], distances[0]) if d <= RELEVANCE_THRESHOLD]
+        logging.info(f"Retrieved {len(relevant_texts)} relevant texts for query: {query}")
+        return relevant_texts
+    except Exception as e:
+        logging.error(f"Error in FAISS search: {e}")
+        return []
 
 def query_huggingface(prompt):
     """Query Hugging Face model with relevant context."""
@@ -85,18 +93,18 @@ def query_huggingface(prompt):
     )
 
     payload = {"inputs": full_prompt}
-    response = requests.post(HF_API_URL, headers=headers, json=payload)
-    
-    if response.status_code == 200:
-        result = response.json()
-        if isinstance(result, list) and result and "generated_text" in result[0]:
-            generated_text = result[0]["generated_text"].strip()
-            if generated_text:
-                return generated_text
-        return "I'm sorry, I couldn't generate a response. Could you rephrase your question?"
-    else:
-        logging.error(f"Hugging Face API request failed with status {response.status_code}")
+    try:
+        response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            if isinstance(result, list) and result and "generated_text" in result[0]:
+                generated_text = result[0]["generated_text"].strip()
+                return generated_text if generated_text else "Sorry, I couldn't generate a response."
+        logging.error(f"Hugging Face API response error: {response.status_code} {response.text}")
         return "I'm experiencing technical difficulties. Please try again later."
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Request error to Hugging Face API: {e}")
+        return "I'm experiencing connectivity issues. Please try again later."
 
 @app.route("/")
 def home():
