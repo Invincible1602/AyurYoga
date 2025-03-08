@@ -1,22 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDtBxjIny77gf1WsYwjJIqxYw3_J0xM-_A",
-  authDomain: "webproject-af0d4.firebaseapp.com",
-  projectId: "webproject-af0d4",
-  storageBucket: "webproject-af0d4.firebasestorage.app",
-  messagingSenderId: "970496237670",
-  appId: "1:970496237670:web:bfdee592292dcb536f0da7",
-  measurementId: "G-56KC68YN4F",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 const styles = {
   container: {
@@ -65,21 +48,30 @@ const styles = {
 };
 
 const SignupScreen = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
-
     try {
-      // Create a new user in Firebase Authentication
-      await createUserWithEmailAndPassword(auth, email, password);
+      const response = await fetch('http://localhost:8000/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Signup failed');
+      }
+      
+      await response.json();
       alert('Signup successful! Please login.');
       navigate('/login'); // Redirect to the login screen
     } catch (error) {
       console.error('Signup error:', error);
-      alert(error.message); // Show error message to the user
+      alert(error.message);
     }
   };
 
@@ -88,11 +80,11 @@ const SignupScreen = () => {
       <form style={styles.form} onSubmit={handleSignup}>
         <h2 style={styles.heading}>Sign Up</h2>
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Username"
           style={styles.input}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
         <input

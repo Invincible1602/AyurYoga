@@ -1,36 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { AuthContext } from '../utils/AuthProvider';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState(null);
-  const auth = getAuth();
+  const { user, setUser } = useContext(AuthContext);
+  // Assuming your JWT payload has a "sub" or "email" field
+  const userEmail = user ? (user.email || user.sub) : null;
 
-  useEffect(() => {
-    // Listen for authentication state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserEmail(user.email);
-      } else {
-        setUserEmail(null);
-      }
-    });
-
-    return () => unsubscribe(); // Cleanup subscription
-  }, [auth]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      alert('Logged out successfully!');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Remove JWT token
+    setUser(null); // Clear the user from context
+    alert('Logged out successfully!');
+    navigate('/login');
   };
 
   const handleNavigateToRecommender = () => {
@@ -142,7 +126,7 @@ const HomePage = () => {
               <Link to="/about" style={styles.navLink}>About</Link>
             </li>
             <li>
-              <Link to='/chatbot' style={styles.navLink}>Chatbot</Link>
+              <Link to="/chatbot" style={styles.navLink}>Chatbot</Link>
             </li>
             {userEmail ? (
               <>
@@ -161,7 +145,6 @@ const HomePage = () => {
                 <li>
                   <Link to="/signup" style={styles.navLink}>Signup</Link>
                 </li>
-                
               </>
             )}
           </ul>
@@ -179,23 +162,34 @@ const HomePage = () => {
             interval={5000}
             showStatus={false}
           >
-            {/* Carousel Slides */}
             <div>
-              <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b" alt="Yoga pose 1" style={styles.carouselImage} />
+              <img 
+                src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b" 
+                alt="Yoga pose 1" 
+                style={styles.carouselImage} 
+              />
               <div className="legend" style={styles.carouselCaption}>
                 <h2>Discover Inner Peace</h2>
                 <p>Embark on a journey of self-discovery through yoga</p>
               </div>
             </div>
             <div>
-              <img src="https://images.unsplash.com/photo-1588286840104-8957b019727f" alt="Yoga pose 2" style={styles.carouselImage} />
+              <img 
+                src="https://images.unsplash.com/photo-1588286840104-8957b019727f" 
+                alt="Yoga pose 2" 
+                style={styles.carouselImage} 
+              />
               <div className="legend" style={styles.carouselCaption}>
                 <h2>Improve Flexibility</h2>
                 <p>Enhance your strength and flexibility with our guided sessions</p>
               </div>
             </div>
             <div>
-              <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773" alt="Yoga pose 3" style={styles.carouselImage} />
+              <img 
+                src="https://images.unsplash.com/photo-1506126613408-eca07ce68773" 
+                alt="Yoga pose 3" 
+                style={styles.carouselImage} 
+              />
               <div className="legend" style={styles.carouselCaption}>
                 <h2>Find Your Balance</h2>
                 <p>Achieve harmony of body and mind through our yoga practices</p>

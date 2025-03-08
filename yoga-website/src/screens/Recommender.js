@@ -1,102 +1,138 @@
-import React from 'react';
-import { Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-const styles = {
-  navbar: {
-    backgroundColor: '#2c3e50', // Darker background for a sleek look
-    padding: '15px 30px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
-  },
-  navbarBrand: {
-    fontSize: '2rem',
-    color: '#fff',
-    textDecoration: 'none',
-    marginRight: '50px',
-    fontWeight: 'bold',
-  },
-  navLinks: {
-    listStyle: 'none',
-    display: 'flex',
-    padding: 0,
-    marginLeft: 'auto',
-  },
-  navLink: {
-    color: '#fff',
-    fontSize: '1.1rem',
-    textDecoration: 'none',
-    marginRight: '25px',
-    transition: 'color 0.3s ease',
-  },
-  navLinkHover: {
-    color: '#3498db',
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'center',   // Horizontally center the content
-    alignItems: 'center',       // Vertically center the content
-    flexDirection: 'column',    // Stack the content vertically
-    height: '100vh',            // Full viewport height
-    backgroundColor: '#ecf0f1', // Light background for the main content
-    padding: '30px 20px',
-    borderRadius: '8px',
-    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.1)', // Subtle shadow for the container
-  },
-  heading: {
-    fontSize: '2.5rem',
-    color: '#2c3e50',
-    fontWeight: 'bold',
-    marginBottom: '20px',
-  },
-  paragraph: {
-    fontSize: '1.2rem',
-    color: '#7f8c8d',
-    marginBottom: '40px',
-    lineHeight: '1.6',
-  },
-  iframe: {
-    width: '80%',
-    height: '600px',
-    border: 'none',
-    borderRadius: '8px', // Smooth corners for the iframe
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Add a shadow around the iframe
-  },
+const diseases = [
+  'Anxiety',
+  'Digestive Issues',
+  'Poor Posture',
+  'Insomnia',
+  'Asthma',
+  'Fatigue',
+  'Back Pain',
+  'Sciatica',
+  'Depression',
+  'Stress',
+  'Endocrine Problems (Diabetes/Infertility/Thyroid)',
+  'Respiratory Diseases',
+  'Muscular/Skeletal Problems',
+  'Urinary Issues',
+  'Nervous System (Brain Fever/Mental Disease)',
+];
+
+// Function to fetch recommendations with the token in the Authorization header
+export const getRecommendations = async (disease) => {
+  const token = localStorage.getItem('token'); // Make sure the login stores token under "token"
+  if (!token) throw new Error('No token found. Please login.');
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+  return axios.get(`${API_BASE_URL}/recommend/`, {
+    params: { disease },
+    headers: { Authorization: `Bearer ${token}` },
+  });
 };
 
 const Recommender = () => {
-  return (
-    <>
-      <div style={styles.navbar}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
-          <a href="/" style={styles.navbarBrand}>Yoga Bliss</a>
-          <ul style={styles.navLinks}>
-            <li>
-              <a href="/" style={styles.navLink}>Home</a>
-            </li>
-            <li>
-              <Link to="/recommender" style={styles.navLink}>
-                Recommendations
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" style={styles.navLink}>
-                About
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
+  const [selectedDisease, setSelectedDisease] = useState(diseases[0]);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-      <Container style={styles.container} className="mt-5">
-        <h2 style={styles.heading}>Yoga Asana Recommender</h2>
-        <p style={styles.paragraph}>Select a disease and get personalized yoga suggestions!</p>
-        <iframe
-          src="http://localhost:8501"
-          style={styles.iframe}
-          title="Yoga Asana Recommender"
-        ></iframe>
-      </Container>
-    </>
+  const fetchRecommendations = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await getRecommendations(selectedDisease);
+      setResults(response.data);
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.detail ||
+        err.message ||
+        'An error occurred while fetching recommendations.';
+      setError(errorMsg);
+      setResults([]);
+      setTimeout(() => setError(''), 5000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>
+        Yoga Asana Recommendations
+      </h1>
+      <div style={{ marginBottom: '16px' }}>
+        <select
+          value={selectedDisease}
+          onChange={(e) => setSelectedDisease(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '8px',
+            fontSize: '16px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+          }}
+        >
+          {diseases.map((disease, idx) => (
+            <option key={idx} value={disease}>
+              {disease}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+        <button
+          onClick={fetchRecommendations}
+          style={{
+            padding: '12px 24px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            backgroundColor: '#319795',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+          }}
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : 'Get Recommendations'}
+        </button>
+      </div>
+      {error && (
+        <div style={{ color: 'red', textAlign: 'center', marginBottom: '16px' }}>
+          {error}
+        </div>
+      )}
+      {results.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {results.map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                padding: '16px',
+              }}
+            >
+              <p style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>
+                Asana Name: {item['Asana Name']}
+              </p>
+              {item['Reasons Not to Perform'] && item['Reasons Not to Perform'].length > 0 && (
+                <div style={{ marginLeft: '16px' }}>
+                  <p style={{ fontStyle: 'italic', marginBottom: '4px' }}>
+                    Reasons Not to Perform:
+                  </p>
+                  {item['Reasons Not to Perform'].map((reason, rIdx) => (
+                    <p key={rIdx} style={{ marginLeft: '8px' }}>
+                      - {reason}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
