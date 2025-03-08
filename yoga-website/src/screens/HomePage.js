@@ -111,47 +111,7 @@ const HomePage = () => {
 
   return (
     <>
-      {/* Navbar */}
-      <nav style={styles.navbar}>
-        <div style={styles.navbarContent}>
-          <Link to="/" style={styles.navbarBrand}>Yoga Bliss</Link>
-          <ul style={styles.navLinks}>
-            <li>
-              <Link to="/" style={styles.navLink}>Home</Link>
-            </li>
-            <li>
-              <Link to="/recommender" style={styles.navLink}>Recommendations</Link>
-            </li>
-            <li>
-              <Link to="/about" style={styles.navLink}>About</Link>
-            </li>
-            <li>
-              <Link to="/chatbot" style={styles.navLink}>Chatbot</Link>
-            </li>
-            {userEmail ? (
-              <>
-                <li>
-                  <span style={{ ...styles.navLink, cursor: 'pointer' }} onClick={handleLogout}>Logout</span>
-                </li>
-                <li>
-                  <span style={styles.navLink}>Welcome, {userEmail}</span>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link to="/login" style={styles.navLink}>Login</Link>
-                </li>
-                <li>
-                  <Link to="/signup" style={styles.navLink}>Signup</Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </nav>
-
-      <main style={styles.mainContent}>
+     <main style={styles.mainContent}>
         {/* Carousel */}
         <div style={styles.carousel}>
           <Carousel 

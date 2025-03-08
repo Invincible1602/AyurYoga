@@ -71,24 +71,6 @@ const About = () => {
 
   return (
     <>
-      {/* Navbar */}
-      <div style={styles.navbar}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
-          <Link to="/" style={styles.navbarBrand}>Yoga Bliss</Link>
-          <ul style={styles.navLinks}>
-            <li>
-              <Link to="/" style={styles.navLink}>Home</Link>
-            </li>
-            <li>
-              <Link to="/recommender" style={styles.navLink}>Recommendations</Link>
-            </li>
-            <li>
-              <Link to="/about" style={styles.navLink}>About</Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
       {/* About Content */}
       <div style={styles.container}>
         <h1 style={styles.heading}>About Us</h1>
