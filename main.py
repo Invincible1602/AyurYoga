@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+from jose.exceptions import ExpiredSignatureError  # Import the exception for expired tokens
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -68,6 +69,7 @@ class Token(BaseModel):
     token_type: str
 
 # Updated dependency: get token from query parameter or Authorization header
+# It now explicitly catches token expiration errors.
 async def get_current_user(
     token: Optional[str] = Query(None, description="JWT token as query parameter"),
     authorization: Optional[str] = Header(None)
@@ -88,6 +90,11 @@ async def get_current_user(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
             )
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token is expired",
+        )
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
