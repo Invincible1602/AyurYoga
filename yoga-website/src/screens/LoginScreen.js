@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // Ensure you import the named export
+import { AuthContext } from '../utils/AuthProvider';
 
 const styles = {
   container: {
@@ -50,7 +52,12 @@ const styles = {
 const LoginScreen = () => {
   const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
+  const { setUser } = useContext(AuthContext);  // Get setUser from context
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // If redirected, this holds the intended destination
+  const from = location.state?.from?.pathname || '/';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -67,10 +74,15 @@ const LoginScreen = () => {
       }
       
       const data = await response.json();
-      // Save JWT token using a consistent key
+      // Save the token under a consistent key
       localStorage.setItem('token', data.access_token);
+      // Decode the token and update the auth context
+      const decodedUser = jwtDecode(data.access_token);
+      setUser(decodedUser);
+      
       alert('Login successful!');
-      navigate('/'); // Redirect to home page
+      // Redirect to the originally intended route
+      navigate(from, { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       alert(error.message);
