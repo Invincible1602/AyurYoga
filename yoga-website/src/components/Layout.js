@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
   return (
     <>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
-      <div style={{ paddingTop: hideNavbarPaths.includes(location.pathname) ? '0px' : '80px' }}>
+      <div style={{ paddingTop: hideNavbarPaths.includes(location.pathname) ? '0px' : '0px' }}>
         {children}
       </div>
     </>

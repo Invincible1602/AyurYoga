@@ -59,25 +59,37 @@ const HomePage = () => {
       transition: 'color 0.3s ease',
     },
     mainContent: {
-      paddingTop: '80px', // To account for fixed navbar
+      // paddingTop: '80px', // To account for fixed navbar
+      paddingTop: '0px', // To account for fixed navbar
     },
     carousel: {
       maxWidth: '100%',
       margin: '0 auto',
+      userSelect: 'none',
+      // border: '10px solid green',
+    },
+    imageContainer: {
+      width: '100%',
+      height: '100%',
+      // border: '10px solid red',
     },
     carouselImage: {
       maxHeight: '600px',
+      // width: '100%',
       width: '100%',
+      height: '100%',
       objectFit: 'cover',
     },
     carouselCaption: {
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      // backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      backgroundColor: '#22222270',
       padding: '20px',
       bottom: '40px',
       color: '#fff',
       textAlign: 'left',
       maxWidth: '50%',
       borderRadius: '4px',
+      backdropFilter: 'blur(3px)',
     },
     container: {
       backgroundColor: '#f8f9fa',
@@ -107,6 +119,7 @@ const HomePage = () => {
       transition: 'all 0.3s ease',
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     },
+
   };
 
   return (
@@ -121,8 +134,10 @@ const HomePage = () => {
             autoPlay={true} 
             interval={5000}
             showStatus={false}
+            emulateTouch
+            
           >
-            <div>
+            <div style={styles.imageContainer}>
               <img 
                 src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b" 
                 alt="Yoga pose 1" 
@@ -133,7 +148,7 @@ const HomePage = () => {
                 <p>Embark on a journey of self-discovery through yoga</p>
               </div>
             </div>
-            <div>
+            <div style={styles.imageContainer}>
               <img 
                 src="https://images.unsplash.com/photo-1588286840104-8957b019727f" 
                 alt="Yoga pose 2" 
@@ -144,7 +159,7 @@ const HomePage = () => {
                 <p>Enhance your strength and flexibility with our guided sessions</p>
               </div>
             </div>
-            <div>
+            <div style={styles.imageContainer}>
               <img 
                 src="https://images.unsplash.com/photo-1506126613408-eca07ce68773" 
                 alt="Yoga pose 3" 
