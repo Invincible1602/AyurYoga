@@ -23,7 +23,8 @@ const Chatbot = () => {
 
     try {
       // Use the backend URL from environment variables or default to http://localhost:8000
-      const backendURL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+      const backendURL =
+        process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
       const response = await axios.post(`${backendURL}/get_response`, {
         message: userInput,
       });
@@ -47,7 +48,7 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="animate-fade-down">
       <h1 style={styles.header}>Yoga Chatbot</h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         <input
@@ -77,7 +78,7 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     padding: "20px",
     maxWidth: "600px",
-    margin: "0 auto",
+    margin: "30px auto",
     textAlign: "center",
     backgroundColor: "#f9f9f9",
     borderRadius: "10px",

@@ -94,7 +94,7 @@ const LoginScreen = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className='animate-fade-down'>
       <form style={styles.form} onSubmit={handleLogin}>
         <h2 style={styles.heading}>Login</h2>
         <input

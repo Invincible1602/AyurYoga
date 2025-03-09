@@ -72,7 +72,7 @@ const About = () => {
   return (
     <>
       {/* About Content */}
-      <div style={styles.container}>
+      <div style={styles.container} className='animate-fade-down'>
         <h1 style={styles.heading}>About Us</h1>
         <p style={styles.paragraph}>
           Welcome to Yoga Bliss! We are a team of passionate yoga instructors and wellness enthusiasts dedicated to helping you achieve balance and tranquility in your life.
