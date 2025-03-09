@@ -32,7 +32,7 @@ AyurYoga is a web application that provides personalized yoga recommendations an
 - **React** – for building the user interface.
 - **React Router** – for handling client-side routing.
 - **Axios** – for making HTTP requests.
-- **(Optional) Chakra UI** – for styling the application.
+
 
 ## Installation
 
