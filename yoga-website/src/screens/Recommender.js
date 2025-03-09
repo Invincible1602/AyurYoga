@@ -56,7 +56,7 @@ const Recommender = () => {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px' }}>
+    <div className='animate-fade-down' style={{ maxWidth: '800px', margin: '0 auto', padding: '16px' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '24px' }}>
         Yoga Asana Recommendations
       </h1>
@@ -81,6 +81,7 @@ const Recommender = () => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
         <button
+        className=''
           onClick={fetchRecommendations}
           style={{
             padding: '12px 24px',

@@ -23,17 +23,17 @@ function App() {
             <Route
               path="/recommender"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <Recommender />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
             <Route
               path="/chatbot"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <Chatbot />
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
           </Routes>

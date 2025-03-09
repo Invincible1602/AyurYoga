@@ -80,7 +80,7 @@ const SignupScreen = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className='animate-fade-down'>
       <form style={styles.form} onSubmit={handleSignup}>
         <h2 style={styles.heading}>Sign Up</h2>
         <input

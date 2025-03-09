@@ -56,9 +56,9 @@ const Navbar = () => {
 
   return (
     <>
-      <nav style={styles.navbar}>
+      <nav style={styles.navbar} className="">
         <div style={styles.navbarContent}>
-          <Link to="/" style={styles.navbarBrand}>
+          <Link to="/" style={styles.navbarBrand} className="animate-fade">
             Yoga Bliss
           </Link>
           <ul style={styles.navLinks}>
