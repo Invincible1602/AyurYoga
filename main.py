@@ -6,20 +6,17 @@ import numpy as np
 import pandas as pd
 from typing import List, Optional
 from datetime import datetime, timedelta
-import requests
-
 from fastapi import FastAPI, HTTPException, Depends, status, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from jose.exceptions import ExpiredSignatureError  # Import the exception for expired tokens
-
+from jose.exceptions import ExpiredSignatureError  # For expired tokens
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
 from dotenv import load_dotenv
+from ollama import chat  # Use the Ollama chat function
+from simple_image_download import simple_image_download as simp  # For Yoga Image Generator
 
 # Load environment variables
 load_dotenv()
@@ -207,9 +204,9 @@ except Exception as e:
     logging.error(f"Error loading FAISS index or text data: {e}")
     index, text_data = None, []
 
-def search_similar_text(query: str):
+def search_similar_text_chat(query: str):
     if index is None:
-        logging.error("FAISS index is not loaded.")
+        logging.info("FAISS index is not loaded.")
         return []
     query_embedding = model.encode([query], convert_to_numpy=True)
     query_embedding = np.array(query_embedding).reshape(1, -1)
@@ -222,16 +219,15 @@ def search_similar_text(query: str):
         logging.info(f"Retrieved {len(relevant_texts)} relevant texts for query: {query}")
         return relevant_texts
     except Exception as e:
-        logging.error(f"Error in FAISS search: {e}")
+        logging.info(f"Error in FAISS search: {e}")
         return []
 
 def query_huggingface(prompt: str) -> str:
-    HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
-    if not HF_API_KEY:
-        logging.error("Hugging Face API key is missing.")
-        return "Sorry, I can't process your request right now."
-    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
-    retrieved_text = search_similar_text(prompt)
+    """
+    Query the local Llama 3.1 model using the Ollama library.
+    (Note: Despite the function name, it now uses Ollama.)
+    """
+    retrieved_text = search_similar_text_chat(prompt)
     if not retrieved_text:
         return "Sorry, no relevant response found."
     formatted_context = "\n".join([f"{i+1}. {text}" for i, text in enumerate(retrieved_text)])
@@ -242,20 +238,19 @@ def query_huggingface(prompt: str) -> str:
         f"User Query: {prompt}\n"
         "Provide a structured response including key points."
     )
-    payload = {"inputs": full_prompt}
     try:
-        response = requests.post("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
-                                 headers=headers, json=payload, timeout=15)
-        if response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list) and result and "generated_text" in result[0]:
-                generated_text = result[0]["generated_text"].strip()
-                return generated_text if generated_text else "Sorry, I couldn't generate a response."
-        logging.error(f"Hugging Face API response error: {response.status_code} {response.text}")
-        return "I'm experiencing technical difficulties. Please try again later."
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Request error to Hugging Face API: {e}")
-        return "I'm experiencing connectivity issues. Please try again later."
+        response = chat(
+            model='llama3.1',
+            messages=[{'role': 'user', 'content': full_prompt}],
+        )
+        generated_text = response.get("message", {}).get("content", "").strip()
+        if generated_text:
+            return generated_text
+        else:
+            raise ValueError("Empty response from model with full prompt.")
+    except Exception as e:
+        logging.info("Ollama query error: " + str(e))
+        return "I'm experiencing issues with the local model. Please try again later."
 
 # -------------------------------
 # API Endpoints
@@ -292,6 +287,41 @@ def recommend(disease: str, current_user: str = Depends(get_current_user)):
     if not suggestions:
         raise HTTPException(status_code=404, detail="No asana suggestions found for the selected disease.")
     return suggestions
+
+@app.get("/search-images", response_model=List[str])
+def search_images(prompt: str, current_user: str = Depends(get_current_user)):
+    """
+    Endpoint for the Yoga Image Generator.
+    Validates that the prompt includes an allowed keyword and returns image URLs.
+    """
+    # Updated allowed keywords include pranayama and surya namaskar.
+    allowed_keywords = ["yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama", "surya namaskar",   "kapalbhati",
+    "bhastrika",
+    "anulom vilom",]
+    if not any(keyword in prompt.lower() for keyword in allowed_keywords):
+        raise HTTPException(
+            status_code=400,
+            detail="Prompt must include one of the following keywords: yoga, asana, pose, ayurveda, ayurvedic, pranayama, surya namaskar"
+        )
+    
+    try:
+        downloader = simp.simple_image_download()
+        results = downloader.urls(prompt, 3)
+        image_urls = []
+        if isinstance(results, list):
+            image_urls = results
+        elif isinstance(results, dict):
+            for key, urls in results.items():
+                image_urls = urls
+                break
+        else:
+            raise ValueError("No images found")
+        if not image_urls:
+            raise HTTPException(status_code=404, detail="No images found for the prompt")
+        return image_urls
+    except Exception as e:
+        logging.error("Error searching images: " + str(e))
+        raise HTTPException(status_code=500, detail="Error searching images")
 
 @app.post("/get_response")
 def get_response(data: dict):

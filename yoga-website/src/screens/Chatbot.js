@@ -47,28 +47,43 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Yoga Chatbot</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          placeholder="Ask a question about yoga or medical knowledge"
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? "Loading..." : "Ask"}
-        </button>
-      </form>
-      {error && <p style={styles.error}>{error}</p>}
-      {botResponse && (
-        <div style={styles.responseCard}>
-          <h2 style={styles.responseHeader}>Bot Response</h2>
-          <p style={styles.responseText}>{botResponse}</p>
-        </div>
-      )}
-    </div>
+    <>
+      {/* Inject keyframes for animations */}
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+        `}
+      </style>
+      <div style={styles.container}>
+        <h1 style={styles.header}>Yoga Chatbot</h1>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <input
+            type="text"
+            value={userInput}
+            onChange={handleInputChange}
+            placeholder="Ask a question about yoga or medical knowledge"
+            style={styles.input}
+          />
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? "Loading..." : "Ask"}
+          </button>
+        </form>
+        {error && <p style={styles.error}>{error}</p>}
+        {botResponse && (
+          <div style={styles.responseCard}>
+            <h2 style={styles.responseHeader}>Bot Response</h2>
+            <p style={styles.responseText}>{botResponse}</p>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
@@ -82,6 +97,7 @@ const styles = {
     backgroundColor: "#f9f9f9",
     borderRadius: "10px",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    animation: "fadeIn 1s ease-in-out",
   },
   header: {
     color: "#333",
@@ -126,6 +142,7 @@ const styles = {
     borderRadius: "10px",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
     textAlign: "left",
+    animation: "slideIn 0.5s ease-out",
   },
   responseHeader: {
     margin: "0 0 10px 0",

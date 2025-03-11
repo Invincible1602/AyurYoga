@@ -1,0 +1,165 @@
+{
+    "asanas": [
+      {
+        "name": "Tadasana",
+        "english_name": "Mountain Pose",
+        "description": "A foundational standing pose that promotes balance and posture.",
+        "benefits": ["Improves posture", "Strengthens thighs, knees, and ankles", "Increases awareness"],
+        "yt_videos": [
+          {
+            "title": "Mountain Pose (Tadasana) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/ZmWQ4LeXxL4"
+          }
+        ]
+      },
+      {
+        "name": "Vrikshasana",
+        "english_name": "Tree Pose",
+        "description": "A balancing pose that resembles the steady stance of a tree.",
+        "benefits": ["Improves balance", "Strengthens legs and back", "Enhances concentration"],
+        "yt_videos": [
+          {
+            "title": "Tree Pose (Vrikshasana) Tutorial - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/eMr9EZEVSo8"
+          }
+        ]
+      },
+      {
+        "name": "Adho Mukha Svanasana",
+        "english_name": "Downward-Facing Dog",
+        "description": "An inversion pose that stretches the entire body.",
+        "benefits": ["Stretches hamstrings and calves", "Strengthens arms and legs", "Relieves stress"],
+        "yt_videos": [
+          {
+            "title": "Downward Dog Pose - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/LQmzaAWu58s"
+          }
+        ]
+      },
+      {
+        "name": "Trikonasana",
+        "english_name": "Triangle Pose",
+        "description": "A standing pose that stretches and strengthens various body parts.",
+        "benefits": ["Stretches legs and torso", "Mobilizes hips", "Opens the chest"],
+        "yt_videos": [
+          {
+            "title": "Triangle Pose (Trikonasana) - Yoga With Adriene",
+            "url": "https://www.youtube.com/watch?v=OQ6NfFIr2jw"
+          }
+        ]
+      },
+      {
+        "name": "Bhujangasana",
+        "english_name": "Cobra Pose",
+        "description": "A backbend that opens the chest and strengthens the spine.",
+        "benefits": ["Strengthens spine", "Stretches chest and lungs", "Improves posture"],
+        "yt_videos": [
+          {
+            "title": "Bhujangasana | Cobra Yoga Pose | Steps | Benefits | Yogic Fitness",
+            "url": "https://www.youtube.com/shorts/smeWGMciNAw"
+          }
+        ]
+      },
+      {
+        "name": "Setu Bandhasana",
+        "english_name": "Bridge Pose",
+        "description": "A backbend and inversion that stretches the chest, neck, and spine.",
+        "benefits": ["Strengthens back and hamstrings", "Improves circulation", "Reduces anxiety"],
+        "yt_videos": [
+          {
+            "title": "Bridge Pose (Setu Bandhasana) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/fG6uUKbQbws"
+          }
+        ]
+      },
+      {
+        "name": "Utkatasana",
+        "english_name": "Chair Pose",
+        "description": "A standing pose that strengthens the legs and core.",
+        "benefits": ["Strengthens thighs and ankles", "Tones shoulders", "Stimulates heart"],
+        "yt_videos": [
+          {
+            "title": "Chair Pose (Utkatasana) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/-xdn8KnWlKA"
+          }
+        ]
+      },
+      {
+        "name": "Virabhadrasana I",
+        "english_name": "Warrior I Pose",
+        "description": "A standing pose that enhances strength and flexibility.",
+        "benefits": ["Strengthens legs and core", "Stretches hips and chest", "Improves focus"],
+        "yt_videos": [
+          {
+            "title": "Warrior I Pose (Virabhadrasana I) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/m-CHztlyh0U"
+          }
+        ]
+      },
+      {
+        "name": "Virabhadrasana II",
+        "english_name": "Warrior II Pose",
+        "description": "A standing pose that builds stamina and concentration.",
+        "benefits": ["Strengthens legs and arms", "Opens hips", "Develops endurance"],
+        "yt_videos": [
+          {
+            "title": "Warrior II Pose (Virabhadrasana II) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/jelGfeveiOc"
+          }
+        ]
+      },
+      {
+        "name": "Virabhadrasana III",
+        "english_name": "Warrior III Pose",
+        "description": "A balancing pose that strengthens the whole body.",
+        "benefits": ["Enhances balance", "Strengthens legs and back", "Improves posture"],
+        "yt_videos": [
+          {
+            "title": "Warrior III Pose (Virabhadrasana III) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/m-CHztlyh0U"
+          }
+        ]
+      },
+      {
+        "name": "Dhanurasana",
+        "english_name": "Bow Pose",
+        "description": "A backbend that deeply opens the chest and shoulders.",
+        "benefits": ["Stretches entire front body", "Improves posture", "Stimulates abdominal organs"],
+        "yt_videos": [
+          {
+            "title": "Bow Pose (Dhanurasana) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/pr4NuZ-vZQQ"
+          }
+        ]
+      },
+      {
+        "name": "Paschimottanasana",
+        "english_name": "Seated Forward Bend",
+        "description": "A seated pose that stretches the back of the body.",
+        "benefits": ["Stretches spine and hamstrings", "Calms the mind", "Improves digestion"],
+        "yt_videos": [
+          {
+            "title": "Seated Forward Bend (Paschimottanasana) - Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/y1ErNTzt5F8"
+          }
+        ]
+      },
+      {
+        "name": "Balasana",
+        "english_name": "Child's Pose",
+        "description": "A resting pose that calms the mind and relieves tension.",
+        "benefits": [
+          "Gently stretches hips and thighs",
+          "Relieves back and neck pain",
+          "Calms the brain and helps relieve stress"
+        ],
+        "yt_videos": [
+          {
+            "title": "How to Do Child's Pose (Balasana) | Yoga With Adriene",
+            "url": "https://www.youtube.com/shorts/1o37AxKYO9A"
+          }
+        ]
+      }
+    ]
+}      
+  

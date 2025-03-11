@@ -7,6 +7,7 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (!user) {
+    // Optionally, add a loading state if auth status is still being determined.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return children;
