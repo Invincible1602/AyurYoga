@@ -16,6 +16,14 @@ AyurYoga is a web application that provides personalized yoga recommendations an
 - **Efficient Similarity Search:**  
   FAISS is used to quickly search and retrieve relevant context from precomputed text data.
 
+- **Yoga Image Generator:**
+  Use our image generator feature to search for yoga-related images by entering a prompt. The generator validates input using allowed keywords (e.g., "yoga", "asana", "pranayama",      etc.) and fetches relevant images from our FastAPI backend.
+
+- **Yoga Pose Shorts:**
+  Explore a collection of yoga poses via an interactive dropdown that displays embedded YouTube Shorts. Select a pose to watch the demonstration video directly on the page.
+
+
+
 ## Tech Stack
 
 ### Backend
