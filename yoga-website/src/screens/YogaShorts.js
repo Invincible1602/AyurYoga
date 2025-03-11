@@ -6,7 +6,9 @@ const YogaShorts = () => {
     const [selectedAsana, setSelectedAsana] = useState(null);
 
     useEffect(() => {
-        setAsanas(yogaData.asanas || []);
+        // Sort asanas alphabetically by name
+        const sortedAsanas = (yogaData.asanas || []).sort((a, b) => a.name.localeCompare(b.name));
+        setAsanas(sortedAsanas);
     }, []);
 
     const getEmbeddedUrl = (url) => {
