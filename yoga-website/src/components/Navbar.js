@@ -8,8 +8,8 @@ const Navbar = () => {
   const userEmail = user ? (user.email || user.sub) : null;
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove JWT token
-    setUser(null); // Clear user context
+    localStorage.removeItem('token'); 
+    setUser(null); 
     alert('Logged out successfully!');
     navigate('/login');
   };
@@ -25,8 +25,8 @@ const Navbar = () => {
       right: 0,
       zIndex: 1000,
       animation: 'fadeInDown 0.5s ease-out',
-      marginBottom: '20px', // extra margin (note: may not affect layout of fixed element)
-      paddingBottom: '10px',  // extra padding inside the navbar
+      marginBottom: '20px', 
+      paddingBottom: '10px',  
     },
     navbarContent: {
       maxWidth: '1200px',
@@ -81,9 +81,6 @@ const Navbar = () => {
         <div style={styles.navbarContent}>
           <Link to="/" style={styles.navbarBrand} className="nav-link">AyurYoga</Link>
           <ul style={styles.navLinks}>
-            <li>
-              <Link to="/" style={styles.navLink} className="nav-link">Home</Link>
-            </li>
             <li>
               <Link to="/recommender" style={styles.navLink} className="nav-link">Recommendations</Link>
             </li>

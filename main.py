@@ -11,19 +11,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from jose.exceptions import ExpiredSignatureError  # For expired tokens
+from jose.exceptions import ExpiredSignatureError 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
-from ollama import chat  # Use the Ollama chat function
-from simple_image_download import simple_image_download as simp  # For Yoga Image Generator
-
-# SQLAlchemy Imports for Database Integration
+from ollama import chat  
+from simple_image_download import simple_image_download as simp  
 from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
-# Load environment variables
+
 load_dotenv()
 
 # -------------------------------
