@@ -18,6 +18,11 @@ from dotenv import load_dotenv
 from ollama import chat  # Use the Ollama chat function
 from simple_image_download import simple_image_download as simp  # For Yoga Image Generator
 
+# SQLAlchemy Imports for Database Integration
+from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+
 # Load environment variables
 load_dotenv()
 
@@ -40,10 +45,35 @@ app.add_middleware(
 )
 
 # -------------------------------
+# Database Setup (SQLite + SQLAlchemy)
+# -------------------------------
+DATABASE_URL = "sqlite:///./users.db"
+
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class UserModel(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+
+Base.metadata.create_all(bind=engine)
+
+# Dependency to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# -------------------------------
 # Authentication Setup
 # -------------------------------
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-users_db = {}  # Simple in-memory user "database"
+# We no longer use an in-memory users_db
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -65,11 +95,11 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-# Updated dependency: get token from query parameter or Authorization header
-# It now explicitly catches token expiration errors.
+# Updated dependency: get token from query parameter or Authorization header and check in DB.
 async def get_current_user(
     token: Optional[str] = Query(None, description="JWT token as query parameter"),
-    authorization: Optional[str] = Header(None)
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db)
 ):
     if token is None and authorization:
         # Expect header in format "Bearer <token>"
@@ -82,10 +112,17 @@ async def get_current_user(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None or username not in users_db:
+        if username is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
+            )
+        # Check if user exists in the database
+        db_user = db.query(UserModel).filter(UserModel.username == username).first()
+        if db_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
             )
     except ExpiredSignatureError:
         raise HTTPException(
@@ -100,7 +137,7 @@ async def get_current_user(
     return username
 
 # -------------------------------
-# Recommendation Setup
+# Recommendation Setup (unchanged)
 # -------------------------------
 try:
     df = pd.read_csv("yoga_asanas_and_diseases.csv")
@@ -175,7 +212,7 @@ def suggest_asanas(name: str) -> List[dict]:
     return results
 
 # -------------------------------
-# Chatbot Setup with FAISS Integration
+# Chatbot Setup with FAISS Integration (unchanged)
 # -------------------------------
 import faiss
 logging.basicConfig(level=logging.INFO)
@@ -229,7 +266,7 @@ def query_huggingface(prompt: str) -> str:
     """
     retrieved_text = search_similar_text_chat(prompt)
     if not retrieved_text:
-        return "Sorry, no relevant response found."
+        return "Sorry, no relevant response found. If you are directly searching for asana, then write it with yoga asana like Navasana yoga pose"
     formatted_context = "\n".join([f"{i+1}. {text}" for i, text in enumerate(retrieved_text)])
     full_prompt = (
         "You are an expert in yoga, health, and wellness. "
@@ -260,15 +297,22 @@ def read_root():
     return {"message": "Welcome to the AyurYoga FastAPI backend!"}
 
 @app.post("/register/", response_model=dict)
-def register(user: User):
-    if user.username in users_db:
+def register(user: User, db: Session = Depends(get_db)):
+    # Check if user already exists in the database
+    db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
+    if db_user:
         raise HTTPException(status_code=400, detail="Username already exists")
-    users_db[user.username] = get_password_hash(user.password)
+    hashed_password = get_password_hash(user.password)
+    new_user = UserModel(username=user.username, hashed_password=hashed_password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
     return {"message": "User registered successfully"}
 
 @app.post("/login/", response_model=Token)
-def login(user: User):
-    if user.username not in users_db or not verify_password(user.password, users_db[user.username]):
+def login(user: User, db: Session = Depends(get_db)):
+    db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
+    if not db_user or not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
@@ -294,10 +338,10 @@ def search_images(prompt: str, current_user: str = Depends(get_current_user)):
     Endpoint for the Yoga Image Generator.
     Validates that the prompt includes an allowed keyword and returns image URLs.
     """
-    # Updated allowed keywords include pranayama and surya namaskar.
-    allowed_keywords = ["yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama", "surya namaskar",   "kapalbhati",
-    "bhastrika",
-    "anulom vilom",]
+    allowed_keywords = [
+        "yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama",
+        "surya namaskar", "kapalbhati", "bhastrika", "anulom vilom",
+    ]
     if not any(keyword in prompt.lower() for keyword in allowed_keywords):
         raise HTTPException(
             status_code=400,

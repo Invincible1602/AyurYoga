@@ -87,9 +87,7 @@ const Navbar = () => {
             <li>
               <Link to="/recommender" style={styles.navLink} className="nav-link">Recommendations</Link>
             </li>
-            <li>
-              <Link to="/about" style={styles.navLink} className="nav-link">About</Link>
-            </li>
+            
             <li>
               <Link to="/chatbot" style={styles.navLink} className="nav-link">Chatbot</Link>
             </li>
@@ -98,6 +96,9 @@ const Navbar = () => {
             </li>
             <li>
               <Link to="/shorts" style={styles.navLink} className="nav-link">Shorts</Link>
+            </li>
+            <li>
+              <Link to="/about" style={styles.navLink} className="nav-link">About</Link>
             </li>
             {userEmail ? (
               <>
