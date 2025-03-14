@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../utils/AuthProvider';
 
-const API_AUTH_BASE_URL = process.env.REACT_APP_AUTH_BACKEND_URL || 'http://localhost:8000';
+const API_AUTH_BASE_URL = "https://ayuryoga-01zd.onrender.com";
 
 const styles = {
   container: {

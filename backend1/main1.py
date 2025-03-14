@@ -43,7 +43,6 @@ app.add_middleware(
 # -------------------------------
 # Minimal Authentication Setup (for protected endpoints)
 # -------------------------------
-# (Reuse similar DB & auth setup as in main.py)
 DATABASE_URL = "sqlite:///./users.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -116,7 +115,7 @@ def search_images(prompt: str, current_user: str = Depends(get_current_user)):
     if not any(keyword in prompt.lower() for keyword in allowed_keywords):
         raise HTTPException(
             status_code=400,
-            detail="Prompt must include one of the following keywords: yoga, asana, pose, ayurveda, ayurvedic, pranayama, surya namaskar"
+            detail="Prompt must include one of the allowed keywords."
         )
     
     try:
@@ -139,7 +138,7 @@ def search_images(prompt: str, current_user: str = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Error searching images")
 
 # -------------------------------
-# Chatbot (FAISS & Ollama) Setup
+# Chatbot (FAISS & Ollama) Setup with Lazy-Loading
 # -------------------------------
 INDEX_PATH = "faiss_index.pkl"
 DATA_PATH = "text_data.pkl"
@@ -147,26 +146,33 @@ EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 RELEVANCE_THRESHOLD = 1.0
 TOP_K = 3
 
-try:
-    if os.path.exists(INDEX_PATH) and os.path.exists(DATA_PATH):
-        with open(INDEX_PATH, "rb") as f:
-            index = pickle.load(f)
-        with open(DATA_PATH, "rb") as f:
-            text_data = pickle.load(f)
-        if not isinstance(index, faiss.IndexFlatL2):
-            raise ValueError("Loaded FAISS index is not a valid IndexFlatL2 object")
-        logging.info("FAISS index and text data loaded successfully!")
-    else:
-        raise FileNotFoundError("FAISS index or text data file is missing.")
-except Exception as e:
-    logging.error(f"Error loading FAISS index or text data: {e}")
-    index, text_data = None, []
+# Global placeholders (loaded lazily)
+_index = None
+_text_data = None
+_model = None
 
-model = SentenceTransformer(EMBEDDING_MODEL)
+def load_model_and_index():
+    global _model, _index, _text_data
+    if _model is None:
+        _model = SentenceTransformer(EMBEDDING_MODEL)
+    if _index is None or not _text_data:
+        if os.path.exists(INDEX_PATH) and os.path.exists(DATA_PATH):
+            with open(INDEX_PATH, "rb") as f:
+                _index = pickle.load(f)
+            with open(DATA_PATH, "rb") as f:
+                _text_data = pickle.load(f)
+            if not isinstance(_index, faiss.IndexFlatL2):
+                raise ValueError("Loaded FAISS index is not a valid IndexFlatL2 object")
+            logging.info("FAISS index and text data loaded successfully!")
+        else:
+            raise FileNotFoundError("FAISS index or text data file is missing.")
+    return _model, _index, _text_data
 
 def search_similar_text_chat(query: str):
-    if index is None:
-        logging.info("FAISS index is not loaded.")
+    try:
+        model, index, text_data = load_model_and_index()
+    except Exception as e:
+        logging.info("Error loading model/index: " + str(e))
         return []
     query_embedding = model.encode([query], convert_to_numpy=True)
     query_embedding = np.array(query_embedding).reshape(1, -1)
@@ -182,10 +188,11 @@ def search_similar_text_chat(query: str):
         logging.info(f"Error in FAISS search: {e}")
         return []
 
-def query_huggingface(prompt: str) -> str:
+def query_chatbot(prompt: str) -> str:
     retrieved_text = search_similar_text_chat(prompt)
     if not retrieved_text:
-        return "Sorry, no relevant response found. If you are directly searching for an asana, try specifying it with a yoga pose name."
+        return ("Sorry, no relevant response found. "
+                "If you are directly searching for an asana, try specifying it with a yoga pose name.")
     formatted_context = "\n".join([f"{i+1}. {text}" for i, text in enumerate(retrieved_text)])
     full_prompt = (
         "You are an expert in yoga, health, and wellness. "
@@ -216,7 +223,7 @@ def get_response(data: dict):
     if not data or "message" not in data:
         raise HTTPException(status_code=400, detail="Please provide a valid question.")
     user_input = data["message"]
-    bot_response = query_huggingface(prompt=user_input)
+    bot_response = query_chatbot(prompt=user_input)
     return {"response": bot_response}
 
 # -------------------------------

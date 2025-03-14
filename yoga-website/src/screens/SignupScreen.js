@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 // Use the backend URL from an environment variable, defaulting to localhost:8000 if not set
-const API_AUTH_BASE_URL = process.env.REACT_APP_AUTH_BACKEND_URL || 'http://localhost:8000';
+const API_AUTH_BASE_URL = "https://ayuryoga-01zd.onrender.com";
 
 const styles = {
   container: {
