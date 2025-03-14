@@ -22,8 +22,9 @@ const Chatbot = () => {
     setBotResponse("");
 
     try {
-      // Use the backend URL from environment variables or default to http://localhost:8000
-      const backendURL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+      // Use the chat backend URL from environment variables or default to http://localhost:8001
+      const backendURL =
+        process.env.REACT_APP_CHAT_BACKEND_URL || "http://localhost:8001";
       const response = await axios.post(`${backendURL}/get_response`, {
         message: userInput,
       });

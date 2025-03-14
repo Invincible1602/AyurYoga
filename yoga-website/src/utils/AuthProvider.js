@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const decodedUser = jwtDecode(token); // Use jwtDecode instead of jwt_decode
+        const decodedUser = jwtDecode(token); 
         if (decodedUser.exp && decodedUser.exp * 1000 < Date.now()) {
           localStorage.removeItem('token');
           setUser(null);

@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../utils/AuthProvider';
 
+const API_AUTH_BASE_URL = process.env.REACT_APP_AUTH_BACKEND_URL || 'http://localhost:8000';
+
 const styles = {
   container: {
     display: 'flex',
@@ -13,7 +15,6 @@ const styles = {
     padding: '20px',
   },
   form: {
-    // Transparent gradient background for the box
     background: 'linear-gradient(135deg, rgba(232,245,233,0.7), rgba(200,230,201,0.7))',
     padding: '40px',
     borderRadius: '8px',
@@ -22,7 +23,7 @@ const styles = {
     minHeight: '500px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center', // Center all children
+    alignItems: 'center',
     justifyContent: 'center',
   },
   heading: {
@@ -31,21 +32,21 @@ const styles = {
     marginBottom: '30px',
   },
   input: {
-    width: '80%', // Fixed width so inputs are centered
+    width: '80%',
     padding: '12px',
     marginBottom: '20px',
     border: '1px solid #ddd',
     borderRadius: '4px',
   },
   button: {
-    padding: '8px 16px', // Smaller, compact button
+    padding: '8px 16px',
     backgroundColor: '#3498db',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '14px',
-    margin: '10px auto 0 auto', // Center the button
+    margin: '10px auto 0 auto',
   },
   link: {
     textAlign: 'center',
@@ -67,7 +68,7 @@ const LoginScreen = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/login/', {
+      const response = await fetch(`${API_AUTH_BASE_URL}/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

@@ -19,6 +19,9 @@ const isValidPrompt = (prompt) => {
   );
 };
 
+// Use the chat backend URL from an environment variable, defaulting to localhost:8001 if not set
+const API_CHAT_BASE_URL = process.env.REACT_APP_CHAT_BACKEND_URL || 'http://localhost:8001';
+
 const YogaImageGenerator = () => {
   const [prompt, setPrompt] = useState('');
   const [images, setImages] = useState([]);
@@ -41,11 +44,9 @@ const YogaImageGenerator = () => {
     setLoading(true);
 
     try {
-      // Use the absolute URL of your FastAPI backend.
-      const response = await fetch(`http://localhost:8000/search-images?prompt=${encodeURIComponent(prompt)}`, {
+      const response = await fetch(`${API_CHAT_BASE_URL}/search-images?prompt=${encodeURIComponent(prompt)}`, {
         headers: {
           'Content-Type': 'application/json',
-          // Include token if available
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });

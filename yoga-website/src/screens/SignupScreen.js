@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// Use the backend URL from an environment variable, defaulting to localhost:8000 if not set
+const API_AUTH_BASE_URL = process.env.REACT_APP_AUTH_BACKEND_URL || 'http://localhost:8000';
+
 const styles = {
   container: {
     display: 'flex',
@@ -61,7 +64,7 @@ const SignupScreen = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/register/', {
+      const response = await fetch(`${API_AUTH_BASE_URL}/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

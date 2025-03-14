@@ -19,12 +19,14 @@ const diseases = [
   'Nervous System (Brain Fever/Mental Disease)',
 ];
 
+// Updated base URL for the authentication & recommendation backend
+const API_AUTH_BASE_URL = process.env.REACT_APP_AUTH_BACKEND_URL || 'http://localhost:8000';
+
 // Function to fetch recommendations with the token in the Authorization header
 export const getRecommendations = async (disease) => {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found. Please login.');
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-  return axios.get(`${API_BASE_URL}/recommend/`, {
+  return axios.get(`${API_AUTH_BASE_URL}/recommend/`, {
     params: { disease },
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -32,7 +34,6 @@ export const getRecommendations = async (disease) => {
 
 // Helper function to generate a Wikipedia link for the asana
 const getAsanaLink = (asanaName) => {
-  // Replace spaces with underscores and encode the name
   const encodedName = encodeURIComponent(asanaName.replace(/ /g, '_'));
   return `https://en.wikipedia.org/wiki/${encodedName}`;
 };
@@ -72,7 +73,6 @@ const Recommender = () => {
   const titleStyle = {
     textAlign: 'center',
     marginBottom: '24px',
-    // Animation for the heading: fades in from above
     animation: 'fadeInDown 1s ease-out',
   };
 
@@ -114,7 +114,6 @@ const Recommender = () => {
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     padding: '16px',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    // Animation for the card: slides in from the left
     animation: 'slideIn 0.5s ease-out',
   };
   const getCardStyle = (idx) =>

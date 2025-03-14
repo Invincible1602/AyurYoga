@@ -1,6 +1,5 @@
 import os
 import difflib
-import pickle
 import logging
 import numpy as np
 import pandas as pd
@@ -12,15 +11,12 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from jose.exceptions import ExpiredSignatureError 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
-from ollama import chat  
-from simple_image_download import simple_image_download as simp  
 from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 load_dotenv()
 
@@ -33,10 +29,17 @@ if not SECRET_KEY:
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-app = FastAPI(title="AyurYoga Backend")
+app = FastAPI(title="AyurYoga Backend - Auth & Recommendation")
+
+origins = [
+    "https://invincible1602.github.io",  # Deployed frontend
+    "http://localhost:3000",              # Local development
+    "http://192.168.29.55:3000",            # Local network testing
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for production
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,7 +49,6 @@ app.add_middleware(
 # Database Setup (SQLite + SQLAlchemy)
 # -------------------------------
 DATABASE_URL = "sqlite:///./users.db"
-
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -59,7 +61,6 @@ class UserModel(Base):
 
 Base.metadata.create_all(bind=engine)
 
-# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -71,7 +72,6 @@ def get_db():
 # Authentication Setup
 # -------------------------------
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# We no longer use an in-memory users_db
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -93,14 +93,12 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-# Updated dependency: get token from query parameter or Authorization header and check in DB.
 async def get_current_user(
     token: Optional[str] = Query(None, description="JWT token as query parameter"),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
     if token is None and authorization:
-        # Expect header in format "Bearer <token>"
         token = authorization.split("Bearer ")[-1].strip()
     if not token:
         raise HTTPException(
@@ -115,7 +113,6 @@ async def get_current_user(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
             )
-        # Check if user exists in the database
         db_user = db.query(UserModel).filter(UserModel.username == username).first()
         if db_user is None:
             raise HTTPException(
@@ -135,7 +132,7 @@ async def get_current_user(
     return username
 
 # -------------------------------
-# Recommendation Setup (unchanged)
+# Recommendation Setup
 # -------------------------------
 try:
     df = pd.read_csv("yoga_asanas_and_diseases.csv")
@@ -210,93 +207,14 @@ def suggest_asanas(name: str) -> List[dict]:
     return results
 
 # -------------------------------
-# Chatbot Setup with FAISS Integration (unchanged)
-# -------------------------------
-import faiss
-logging.basicConfig(level=logging.INFO)
-
-INDEX_PATH = "faiss_index.pkl"
-DATA_PATH = "text_data.pkl"
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-RELEVANCE_THRESHOLD = 1.0
-TOP_K = 3
-
-from sentence_transformers import SentenceTransformer
-model = SentenceTransformer(EMBEDDING_MODEL)
-
-try:
-    if os.path.exists(INDEX_PATH) and os.path.exists(DATA_PATH):
-        with open(INDEX_PATH, "rb") as f:
-            index = pickle.load(f)
-        with open(DATA_PATH, "rb") as f:
-            text_data = pickle.load(f)
-        if not isinstance(index, faiss.IndexFlatL2):
-            raise ValueError("Loaded FAISS index is not a valid IndexFlatL2 object")
-        logging.info("FAISS index and text data loaded successfully!")
-    else:
-        raise FileNotFoundError("FAISS index or text data file is missing.")
-except Exception as e:
-    logging.error(f"Error loading FAISS index or text data: {e}")
-    index, text_data = None, []
-
-def search_similar_text_chat(query: str):
-    if index is None:
-        logging.info("FAISS index is not loaded.")
-        return []
-    query_embedding = model.encode([query], convert_to_numpy=True)
-    query_embedding = np.array(query_embedding).reshape(1, -1)
-    try:
-        distances, indices = index.search(query_embedding, TOP_K)
-        relevant_texts = [
-            text_data[i] for i, d in zip(indices[0], distances[0])
-            if d <= RELEVANCE_THRESHOLD
-        ]
-        logging.info(f"Retrieved {len(relevant_texts)} relevant texts for query: {query}")
-        return relevant_texts
-    except Exception as e:
-        logging.info(f"Error in FAISS search: {e}")
-        return []
-
-def query_huggingface(prompt: str) -> str:
-    """
-    Query the local Llama 3.1 model using the Ollama library.
-    (Note: Despite the function name, it now uses Ollama.)
-    """
-    retrieved_text = search_similar_text_chat(prompt)
-    if not retrieved_text:
-        return "Sorry, no relevant response found. If you are directly searching for asana, then write it with yoga asana like Navasana yoga pose"
-    formatted_context = "\n".join([f"{i+1}. {text}" for i, text in enumerate(retrieved_text)])
-    full_prompt = (
-        "You are an expert in yoga, health, and wellness. "
-        "Use the provided context to answer the user's question clearly and concisely.\n\n"
-        f"Context:\n{formatted_context}\n\n"
-        f"User Query: {prompt}\n"
-        "Provide a structured response including key points."
-    )
-    try:
-        response = chat(
-            model='llama3.1',
-            messages=[{'role': 'user', 'content': full_prompt}],
-        )
-        generated_text = response.get("message", {}).get("content", "").strip()
-        if generated_text:
-            return generated_text
-        else:
-            raise ValueError("Empty response from model with full prompt.")
-    except Exception as e:
-        logging.info("Ollama query error: " + str(e))
-        return "I'm experiencing issues with the local model. Please try again later."
-
-# -------------------------------
-# API Endpoints
+# API Endpoints for Authentication & Recommendation
 # -------------------------------
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the AyurYoga FastAPI backend!"}
+    return {"message": "Welcome to the AyurYoga Backend (Auth & Recommendation)!"}
 
 @app.post("/register/", response_model=dict)
 def register(user: User, db: Session = Depends(get_db)):
-    # Check if user already exists in the database
     db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -329,49 +247,6 @@ def recommend(disease: str, current_user: str = Depends(get_current_user)):
     if not suggestions:
         raise HTTPException(status_code=404, detail="No asana suggestions found for the selected disease.")
     return suggestions
-
-@app.get("/search-images", response_model=List[str])
-def search_images(prompt: str, current_user: str = Depends(get_current_user)):
-    """
-    Endpoint for the Yoga Image Generator.
-    Validates that the prompt includes an allowed keyword and returns image URLs.
-    """
-    allowed_keywords = [
-        "yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama",
-        "surya namaskar", "kapalbhati", "bhastrika", "anulom vilom",
-    ]
-    if not any(keyword in prompt.lower() for keyword in allowed_keywords):
-        raise HTTPException(
-            status_code=400,
-            detail="Prompt must include one of the following keywords: yoga, asana, pose, ayurveda, ayurvedic, pranayama, surya namaskar"
-        )
-    
-    try:
-        downloader = simp.simple_image_download()
-        results = downloader.urls(prompt, 3)
-        image_urls = []
-        if isinstance(results, list):
-            image_urls = results
-        elif isinstance(results, dict):
-            for key, urls in results.items():
-                image_urls = urls
-                break
-        else:
-            raise ValueError("No images found")
-        if not image_urls:
-            raise HTTPException(status_code=404, detail="No images found for the prompt")
-        return image_urls
-    except Exception as e:
-        logging.error("Error searching images: " + str(e))
-        raise HTTPException(status_code=500, detail="Error searching images")
-
-@app.post("/get_response")
-def get_response(data: dict):
-    if not data or "message" not in data:
-        raise HTTPException(status_code=400, detail="Please provide a valid question.")
-    user_input = data["message"]
-    bot_response = query_huggingface(prompt=user_input)
-    return {"response": bot_response}
 
 if __name__ == "__main__":
     import uvicorn
