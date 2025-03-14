@@ -155,17 +155,32 @@ def load_model_and_index():
     global _model, _index, _text_data
     if _model is None:
         _model = SentenceTransformer(EMBEDDING_MODEL)
+    
+    # Check file sizes to ensure they are less than 512 MB
+    max_size_bytes = 512 * 1024 * 1024  # 512 MB in bytes
+    if os.path.exists(INDEX_PATH):
+        index_size = os.path.getsize(INDEX_PATH)
+        if index_size > max_size_bytes:
+            raise ValueError(f"FAISS index file size ({index_size/1024/1024:.2f} MB) exceeds 512 MB limit")
+    else:
+        raise FileNotFoundError("FAISS index file is missing.")
+    
+    if os.path.exists(DATA_PATH):
+        data_size = os.path.getsize(DATA_PATH)
+        if data_size > max_size_bytes:
+            raise ValueError(f"Text data file size ({data_size/1024/1024:.2f} MB) exceeds 512 MB limit")
+    else:
+        raise FileNotFoundError("Text data file is missing.")
+
+    # Load index and text data if not already loaded
     if _index is None or not _text_data:
-        if os.path.exists(INDEX_PATH) and os.path.exists(DATA_PATH):
-            with open(INDEX_PATH, "rb") as f:
-                _index = pickle.load(f)
-            with open(DATA_PATH, "rb") as f:
-                _text_data = pickle.load(f)
-            if not isinstance(_index, faiss.IndexFlatL2):
-                raise ValueError("Loaded FAISS index is not a valid IndexFlatL2 object")
-            logging.info("FAISS index and text data loaded successfully!")
-        else:
-            raise FileNotFoundError("FAISS index or text data file is missing.")
+        with open(INDEX_PATH, "rb") as f:
+            _index = pickle.load(f)
+        with open(DATA_PATH, "rb") as f:
+            _text_data = pickle.load(f)
+        if not isinstance(_index, faiss.IndexFlatL2):
+            raise ValueError("Loaded FAISS index is not a valid IndexFlatL2 object")
+        logging.info("FAISS index and text data loaded successfully!")
     return _model, _index, _text_data
 
 def search_similar_text_chat(query: str):
