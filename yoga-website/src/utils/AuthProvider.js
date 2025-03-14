@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
-
+import { jwtDecode } from 'jwt-decode'; 
 
 export const AuthContext = createContext();
 
@@ -11,8 +10,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const decodedUser = jwt_decode(token);
-        // Check if the token has expired
+        const decodedUser = jwtDecode(token); // Use jwtDecode instead of jwt_decode
         if (decodedUser.exp && decodedUser.exp * 1000 < Date.now()) {
           localStorage.removeItem('token');
           setUser(null);
