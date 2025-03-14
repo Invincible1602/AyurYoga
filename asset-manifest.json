@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/AyurYoga/static/css/main.5b16202c.css",
+    "main.js": "/AyurYoga/static/js/main.7c3d95d0.js",
+    "static/js/488.4d8ba4be.chunk.js": "/AyurYoga/static/js/488.4d8ba4be.chunk.js",
+    "index.html": "/AyurYoga/index.html",
+    "main.5b16202c.css.map": "/AyurYoga/static/css/main.5b16202c.css.map",
+    "main.7c3d95d0.js.map": "/AyurYoga/static/js/main.7c3d95d0.js.map",
+    "488.4d8ba4be.chunk.js.map": "/AyurYoga/static/js/488.4d8ba4be.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5b16202c.css",
+    "static/js/main.7c3d95d0.js"
+  ]
+}
