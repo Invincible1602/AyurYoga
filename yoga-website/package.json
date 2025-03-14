@@ -24,7 +24,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "https://Invincible1602.github.io/AyurYoga",
+  "homepage": "https://invincible1602.github.io/AyurYoga/",
   "eslintConfig": {
     "extends": [
       "react-app",
