@@ -21,6 +21,7 @@ from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
+
 load_dotenv()
 
 # -------------------------------
@@ -32,16 +33,10 @@ if not SECRET_KEY:
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Use the deployed frontend URL as the allowed origin.
-# If FRONTEND_URL is not provided via environment, default to your deployed frontend.
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://invincible1602.github.io/AyurYoga/")
-
 app = FastAPI(title="AyurYoga Backend")
-
-# Updated CORS configuration to allow only the deployed frontend origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=["*"],  # Adjust for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -76,6 +71,7 @@ def get_db():
 # Authentication Setup
 # -------------------------------
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# We no longer use an in-memory users_db
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -139,7 +135,7 @@ async def get_current_user(
     return username
 
 # -------------------------------
-# Recommendation Setup
+# Recommendation Setup (unchanged)
 # -------------------------------
 try:
     df = pd.read_csv("yoga_asanas_and_diseases.csv")
@@ -214,7 +210,7 @@ def suggest_asanas(name: str) -> List[dict]:
     return results
 
 # -------------------------------
-# Chatbot Setup with FAISS Integration
+# Chatbot Setup with FAISS Integration (unchanged)
 # -------------------------------
 import faiss
 logging.basicConfig(level=logging.INFO)
@@ -300,6 +296,7 @@ def read_root():
 
 @app.post("/register/", response_model=dict)
 def register(user: User, db: Session = Depends(get_db)):
+    # Check if user already exists in the database
     db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -335,6 +332,10 @@ def recommend(disease: str, current_user: str = Depends(get_current_user)):
 
 @app.get("/search-images", response_model=List[str])
 def search_images(prompt: str, current_user: str = Depends(get_current_user)):
+    """
+    Endpoint for the Yoga Image Generator.
+    Validates that the prompt includes an allowed keyword and returns image URLs.
+    """
     allowed_keywords = [
         "yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama",
         "surya namaskar", "kapalbhati", "bhastrika", "anulom vilom",
