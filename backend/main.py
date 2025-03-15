@@ -18,9 +18,6 @@ from sqlalchemy.orm import sessionmaker, Session
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# New import for image search functionality:
-from simple_image_download import simple_image_download as simp
-
 load_dotenv()
 
 # -------------------------------
@@ -32,7 +29,7 @@ if not SECRET_KEY:
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-app = FastAPI(title="AyurYoga Backend - Auth, Recommendation & Image Search")
+app = FastAPI(title="AyurYoga Backend - Auth & Recommendation")
 
 origins = [
     "https://invincible1602.github.io",  # Deployed frontend
@@ -210,11 +207,11 @@ def suggest_asanas(name: str) -> List[dict]:
     return results
 
 # -------------------------------
-# API Endpoints for Authentication, Recommendation & Image Search
+# API Endpoints for Authentication & Recommendation
 # -------------------------------
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the AyurYoga Backend (Auth, Recommendation & Image Search)!"}
+    return {"message": "Welcome to the AyurYoga Backend (Auth & Recommendation)!"}
 
 @app.post("/register/", response_model=dict)
 def register(user: User, db: Session = Depends(get_db)):
@@ -250,40 +247,6 @@ def recommend(disease: str, current_user: str = Depends(get_current_user)):
     if not suggestions:
         raise HTTPException(status_code=404, detail="No asana suggestions found for the selected disease.")
     return suggestions
-
-# -------------------------------
-# IMAGE SEARCH ENDPOINT
-# -------------------------------
-@app.get("/search-images", response_model=List[str])
-def search_images(prompt: str, current_user: str = Depends(get_current_user)):
-    allowed_keywords = [
-        "yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama",
-        "surya namaskar", "kapalbhati", "bhastrika", "anulom vilom",
-    ]
-    if not any(keyword in prompt.lower() for keyword in allowed_keywords):
-        raise HTTPException(
-            status_code=400,
-            detail="Prompt must include one of the allowed keywords."
-        )
-    
-    try:
-        downloader = simp.simple_image_download()
-        results = downloader.urls(prompt, 3)
-        image_urls = []
-        if isinstance(results, list):
-            image_urls = results
-        elif isinstance(results, dict):
-            for key, urls in results.items():
-                image_urls = urls
-                break
-        else:
-            raise ValueError("No images found")
-        if not image_urls:
-            raise HTTPException(status_code=404, detail="No images found for the prompt")
-        return image_urls
-    except Exception as e:
-        logging.error("Error searching images: " + str(e))
-        raise HTTPException(status_code=500, detail="Error searching images")
 
 if __name__ == "__main__":
     import uvicorn
