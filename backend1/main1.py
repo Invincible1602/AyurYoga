@@ -1,14 +1,17 @@
 import os
+import difflib
 import logging
 import pickle
 import numpy as np
+import pandas as pd
+from typing import List, Optional
+from datetime import datetime, timedelta
 from fastapi import FastAPI, HTTPException, Depends, status, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from simple_image_download import simple_image_download as simp
 from sentence_transformers import SentenceTransformer
 from ollama import chat
 import faiss
@@ -24,7 +27,7 @@ if not SECRET_KEY:
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-app = FastAPI(title="AyurYoga Backend - Image & Chatbot")
+app = FastAPI(title="AyurYoga Backend - Chatbot")
 
 origins = [
     "https://invincible1602.github.io",
@@ -102,40 +105,6 @@ async def get_current_user(
             detail="Could not validate credentials",
         )
     return username
-
-# -------------------------------
-# Image Search Endpoint Setup
-# -------------------------------
-@app.get("/search-images", response_model=list)
-def search_images(prompt: str, current_user: str = Depends(get_current_user)):
-    allowed_keywords = [
-        "yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama",
-        "surya namaskar", "kapalbhati", "bhastrika", "anulom vilom",
-    ]
-    if not any(keyword in prompt.lower() for keyword in allowed_keywords):
-        raise HTTPException(
-            status_code=400,
-            detail="Prompt must include one of the allowed keywords."
-        )
-    
-    try:
-        downloader = simp.simple_image_download()
-        results = downloader.urls(prompt, 3)
-        image_urls = []
-        if isinstance(results, list):
-            image_urls = results
-        elif isinstance(results, dict):
-            for key, urls in results.items():
-                image_urls = urls
-                break
-        else:
-            raise ValueError("No images found")
-        if not image_urls:
-            raise HTTPException(status_code=404, detail="No images found for the prompt")
-        return image_urls
-    except Exception as e:
-        logging.error("Error searching images: " + str(e))
-        raise HTTPException(status_code=500, detail="Error searching images")
 
 # -------------------------------
 # Chatbot (FAISS & Ollama) Setup with Lazy-Loading
@@ -246,7 +215,7 @@ def get_response(data: dict):
 # -------------------------------
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the AyurYoga Backend (Image & Chatbot)!"}
+    return {"message": "Welcome to the AyurYoga Backend (Chatbot)!"}
 
 if __name__ == "__main__":
     import uvicorn
