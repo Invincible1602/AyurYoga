@@ -197,6 +197,18 @@ def read_root():
     """Root endpoint."""
     return {"message": "Welcome to the AyurYoga Backend!"}
 
+# -------------------------------
+# Main: Using ngrok to expose the API
+# -------------------------------
 if __name__ == "__main__":
+    from pyngrok import ngrok
     import uvicorn
+
+    # Set your ngrok auth token
+    ngrok.set_auth_token("2uLIuiUQNfxGsYqWNT8b4T1AJdX_3CUgUzkk8NgSb1gRkqL4Z")
+    
+    # Open an ngrok tunnel on port 8001
+    public_url = ngrok.connect(8001, bind_tls=True)
+    print("ngrok tunnel established at:", public_url)
+
     uvicorn.run("main1:app", host="0.0.0.0", port=8001, reload=True)

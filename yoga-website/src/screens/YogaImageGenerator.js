@@ -19,8 +19,8 @@ const isValidPrompt = (prompt) => {
   );
 };
 
-// Use the chat backend URL from an environment variable, defaulting to localhost:8001 if not set
-const API_CHAT_BASE_URL = process.env.REACT_APP_CHAT_BACKEND_URL || 'http://localhost:8001';
+// Use the chat backend URL from environment variables or default to the ngrok URL
+const API_CHAT_BASE_URL = process.env.REACT_APP_CHAT_BACKEND_URL || 'https://cf85-2405-201-6004-63f0-599a-fed4-3d3b-c72f.ngrok-free.app';
 
 const YogaImageGenerator = () => {
   const [prompt, setPrompt] = useState('');
