@@ -1,4 +1,5 @@
 import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"  # Disable parallelism to avoid tokenizers warnings
 import logging
 import pickle
 import gzip
@@ -12,7 +13,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from simple_image_download import simple_image_download as simp
 from sentence_transformers import SentenceTransformer
-from ollama import chat
+from langchain.llms import HuggingFaceHub
 
 # Load environment variables
 load_dotenv()
@@ -73,7 +74,6 @@ async def get_current_user(
         token = authorization.split("Bearer ")[-1].strip()
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -86,7 +86,6 @@ async def get_current_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token is expired")
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-
     return username
 
 # -------------------------------
@@ -141,7 +140,7 @@ def search_similar_text_chat(query: str):
         return []
 
     query_embedding = model.encode([query], convert_to_numpy=True).reshape(1, -1)
-    
+
     try:
         distances, indices = index.search(query_embedding, TOP_K)
         relevant_texts = [
@@ -152,6 +151,13 @@ def search_similar_text_chat(query: str):
     except Exception as e:
         logging.info(f"Error in FAISS search: {e}")
         return []
+
+# Instantiate the model using HuggingFaceHub with the specified parameters
+llm = HuggingFaceHub(
+    repo_id="mistralai/Mistral-7B-Instruct-v0.3",
+    model_kwargs={'temperature': 0.6, 'max_length': 500},
+    huggingfacehub_api_token=os.getenv("HUGGINGFACE_API_KEY")
+)
 
 def query_chatbot(prompt: str) -> str:
     """Generates a chatbot response based on retrieved text data."""
@@ -169,14 +175,10 @@ def query_chatbot(prompt: str) -> str:
     )
 
     try:
-        response = chat(
-            model='llama3.1',
-            messages=[{'role': 'user', 'content': full_prompt}],
-        )
-        generated_text = response.get("message", {}).get("content", "").strip()
+        generated_text = llm.invoke(full_prompt)
         return generated_text if generated_text else "I'm experiencing issues with the chatbot model."
     except Exception as e:
-        logging.info(f"Ollama query error: {e}")
+        logging.info(f"HuggingFaceHub query error: {e}")
         return "I'm experiencing issues with the chatbot model."
 
 # -------------------------------
@@ -187,7 +189,6 @@ def get_response(data: dict):
     """API endpoint to get chatbot responses."""
     if not data or "message" not in data:
         raise HTTPException(status_code=400, detail="Please provide a valid question.")
-    
     user_input = data["message"]
     bot_response = query_chatbot(prompt=user_input)
     return {"response": bot_response}
@@ -198,17 +199,8 @@ def read_root():
     return {"message": "Welcome to the AyurYoga Backend!"}
 
 # -------------------------------
-# Main: Using ngrok to expose the API
+# Main: Running the API with Uvicorn
 # -------------------------------
 if __name__ == "__main__":
-    from pyngrok import ngrok
     import uvicorn
-
-    # Set your ngrok auth token
-    ngrok.set_auth_token("2uLIuiUQNfxGsYqWNT8b4T1AJdX_3CUgUzkk8NgSb1gRkqL4Z")
-    
-    # Open an ngrok tunnel on port 8001
-    public_url = ngrok.connect(8001, bind_tls=True)
-    print("ngrok tunnel established at:", public_url)
-
     uvicorn.run("main1:app", host="0.0.0.0", port=8001, reload=True)
