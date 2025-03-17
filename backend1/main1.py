@@ -9,12 +9,11 @@ from fastapi import FastAPI, HTTPException, Depends, status, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, String, Integer
-# Updated SQLAlchemy import for declarative_base
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 from simple_image_download import simple_image_download as simp
 from sentence_transformers import SentenceTransformer
-# Updated import for the HuggingFaceEndpoint (new package)
-from langchain_huggingface import HuggingFaceEndpoint
+from langchain.llms import HuggingFaceHub
 
 # Load environment variables
 load_dotenv()
@@ -153,8 +152,8 @@ def search_similar_text_chat(query: str):
         logging.info(f"Error in FAISS search: {e}")
         return []
 
-# Instantiate the model using HuggingFaceEndpoint with the specified parameters
-llm = HuggingFaceEndpoint(
+# Instantiate the model using HuggingFaceHub with the specified parameters
+llm = HuggingFaceHub(
     repo_id="mistralai/Mistral-7B-Instruct-v0.3",
     model_kwargs={'temperature': 0.6, 'max_length': 500},
     huggingfacehub_api_token=os.getenv("HUGGINGFACE_API_KEY")
@@ -179,7 +178,7 @@ def query_chatbot(prompt: str) -> str:
         generated_text = llm.invoke(full_prompt)
         return generated_text if generated_text else "I'm experiencing issues with the chatbot model."
     except Exception as e:
-        logging.info(f"HuggingFaceEndpoint query error: {e}")
+        logging.info(f"HuggingFaceHub query error: {e}")
         return "I'm experiencing issues with the chatbot model."
 
 # -------------------------------
@@ -204,5 +203,4 @@ def read_root():
 # -------------------------------
 if __name__ == "__main__":
     import uvicorn
-    # Use the PORT provided by the environment (default to 8000) and disable reload for production
-    uvicorn.run("main1:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+    uvicorn.run("main1:app", host="0.0.0.0", port=8000)
