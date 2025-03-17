@@ -5,6 +5,8 @@ SQLAlchemy
 simple_image_download
 sentence-transformers
 langchain
+langchain-community
+huggingface_hub
 python-jose
 numpy
 faiss-cpu
