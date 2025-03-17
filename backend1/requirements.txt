@@ -6,6 +6,7 @@ simple_image_download
 sentence-transformers
 langchain
 langchain-community
+langchain-huggingface
 huggingface_hub
 python-jose
 numpy
