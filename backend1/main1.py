@@ -92,7 +92,7 @@ async def get_current_user(
 # -------------------------------
 # FAISS & Text Data Setup
 # -------------------------------
-INDEX_PATH = "faiss_index.pkl"
+INDEX_PATH = "faiss_index.pkl"  
 DATA_PATH = "text_data.pkl.gz"
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 RELEVANCE_THRESHOLD = 1.0
@@ -104,13 +104,13 @@ _text_data = None
 _model = None
 
 def load_model_and_index():
-    """Loads the Sentence Transformer model, FAISS index, and text data."""
+    """Loads the Sentence Transformer model, text data, and builds a new FAISS index using IndexFlatL2."""
     global _model, _index, _text_data
 
     if _model is None:
         _model = SentenceTransformer(EMBEDDING_MODEL)
 
-    # Load compressed text data
+    # Load compressed text data (assumed to be a list of strings)
     if os.path.exists(DATA_PATH):
         logging.info("Loading compressed text data...")
         with gzip.open(DATA_PATH, "rb") as f:
@@ -119,16 +119,17 @@ def load_model_and_index():
     else:
         raise FileNotFoundError(f"Text data file '{DATA_PATH}' is missing.")
 
-    # Load FAISS index
-    if os.path.exists(INDEX_PATH):
-        logging.info("Loading FAISS index...")
-        with open(INDEX_PATH, "rb") as f:
-            _index = pickle.load(f)
-        if not (hasattr(_index, "search") and callable(_index.search)):
-            raise ValueError("Loaded FAISS index is not a valid index object")
-        logging.info("FAISS index loaded successfully.")
-    else:
-        raise FileNotFoundError(f"FAISS index file '{INDEX_PATH}' is missing.")
+    # Compute the embedding dimension from a sample
+    sample_embedding = _model.encode(["sample"], convert_to_numpy=True)
+    d = sample_embedding.shape[1]
+    # Create a new FAISS index using IndexFlatL2 (which doesn't require training)
+    _index = faiss.IndexFlatL2(d)
+    logging.info(f"Created FAISS IndexFlatL2 with dimension {d}.")
+
+    # Compute embeddings for all text entries and add them to the index
+    embeddings = _model.encode(_text_data, convert_to_numpy=True)
+    _index.add(embeddings)
+    logging.info("FAISS IndexFlatL2 populated with text data embeddings.")
 
     return _model, _index, _text_data
 
@@ -140,6 +141,7 @@ def search_similar_text_chat(query: str):
         logging.error(f"Error loading model/index: {e}")
         return []
 
+    # Encode the query into an embedding vector
     query_embedding = model.encode([query], convert_to_numpy=True).reshape(1, -1)
 
     try:
