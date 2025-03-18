@@ -19,8 +19,8 @@ const isValidPrompt = (prompt) => {
   );
 };
 
-// Use the chat backend URL from environment variables or default to the ngrok URL
-const API_CHAT_BASE_URL = process.env.REACT_APP_CHAT_BACKEND_URL || 'https://cf85-2405-201-6004-63f0-599a-fed4-3d3b-c72f.ngrok-free.app';
+// Use the chat backend URL from environment variables or default to localhost with protocol
+const API_CHAT_BASE_URL = process.env.REACT_APP_CHAT_BACKEND_URL || 'http://localhost:8000';
 
 const YogaImageGenerator = () => {
   const [prompt, setPrompt] = useState('');
@@ -47,7 +47,8 @@ const YogaImageGenerator = () => {
       const response = await fetch(`${API_CHAT_BASE_URL}/search-images?prompt=${encodeURIComponent(prompt)}`, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          // Make sure a valid token is stored in localStorage if required by your backend.
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
         }
       });
 

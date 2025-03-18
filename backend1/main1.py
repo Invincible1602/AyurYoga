@@ -14,6 +14,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from simple_image_download import simple_image_download as simp
 from sentence_transformers import SentenceTransformer
 from langchain.llms import HuggingFaceHub
+from typing import List
 
 # Load environment variables
 load_dotenv()
@@ -28,6 +29,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI(title="AyurYoga Backend - Image & Chatbot")
 
+# Allowed origins for CORS
 origins = [
     "https://invincible1602.github.io",
     "http://localhost:3000",
@@ -63,7 +65,6 @@ def get_db():
 
 from jose import JWTError, jwt
 from jose.exceptions import ExpiredSignatureError
-from fastapi import Header
 
 async def get_current_user(
     token: str = Query(None, description="JWT token as query parameter"),
@@ -136,7 +137,7 @@ def search_similar_text_chat(query: str):
     try:
         model, index, text_data = load_model_and_index()
     except Exception as e:
-        logging.info(f"Error loading model/index: {e}")
+        logging.error(f"Error loading model/index: {e}")
         return []
 
     query_embedding = model.encode([query], convert_to_numpy=True).reshape(1, -1)
@@ -149,7 +150,7 @@ def search_similar_text_chat(query: str):
         logging.info(f"Retrieved {len(relevant_texts)} relevant texts for query: {query}")
         return relevant_texts
     except Exception as e:
-        logging.info(f"Error in FAISS search: {e}")
+        logging.error(f"Error in FAISS search: {e}")
         return []
 
 # Instantiate the model using HuggingFaceHub with the specified parameters
@@ -175,10 +176,10 @@ def query_chatbot(prompt: str) -> str:
     )
 
     try:
-        generated_text = llm.invoke(full_prompt)
+        generated_text = llm(full_prompt)
         return generated_text if generated_text else "I'm experiencing issues with the chatbot model."
     except Exception as e:
-        logging.info(f"HuggingFaceHub query error: {e}")
+        logging.error(f"HuggingFaceHub query error: {e}")
         return "I'm experiencing issues with the chatbot model."
 
 # -------------------------------
@@ -192,6 +193,38 @@ def get_response(data: dict):
     user_input = data["message"]
     bot_response = query_chatbot(prompt=user_input)
     return {"response": bot_response}
+
+@app.get("/search-images", response_model=List[str])
+def search_images(prompt: str, current_user: str = Depends(get_current_user)):
+    allowed_keywords = [
+        "yoga", "asana", "pose", "ayurveda", "ayurvedic", "pranayama",
+        "surya namaskar", "kapalbhati", "bhastrika", "anulom vilom",
+    ]
+    if not any(keyword in prompt.lower() for keyword in allowed_keywords):
+        raise HTTPException(
+            status_code=400,
+            detail="Prompt must include one of the allowed keywords."
+        )
+    
+    try:
+        downloader = simp.simple_image_download()
+        results = downloader.urls(prompt, 3)
+        image_urls = []
+        if isinstance(results, list):
+            image_urls = results
+        elif isinstance(results, dict):
+            # Use the first key's list of URLs
+            for key, urls in results.items():
+                image_urls = urls
+                break
+        else:
+            raise ValueError("No images found")
+        if not image_urls:
+            raise HTTPException(status_code=404, detail="No images found for the prompt")
+        return image_urls
+    except Exception as e:
+        logging.error("Error searching images: " + str(e))
+        raise HTTPException(status_code=500, detail="Error searching images")
 
 @app.get("/")
 def read_root():
